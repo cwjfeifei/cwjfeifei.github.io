@@ -20,11 +20,7 @@
 2 命名规范
 3 资源文件规范
 4 版本统一规范
-5 第三方库规范
-6 注释规范
-7 其他的一些规范
-
-1 前言为了利于项目维护以及规范开发，促进成员之间Code Review的效率，故提出以下开发规范">
+5 第三方库规范">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android开发规范">
 <meta property="og:url" content="http://yoursite.com/2017/03/10/Android开发规范/index.html">
@@ -34,12 +30,8 @@
 2 命名规范
 3 资源文件规范
 4 版本统一规范
-5 第三方库规范
-6 注释规范
-7 其他的一些规范
-
-1 前言为了利于项目维护以及规范开发，促进成员之间Code Review的效率，故提出以下开发规范">
-<meta property="og:updated_time" content="2017-03-11T17:06:04.951Z">
+5 第三方库规范">
+<meta property="og:updated_time" content="2017-03-13T09:05:00.419Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android开发规范">
 <meta name="twitter:description" content="摘要
@@ -47,11 +39,7 @@
 2 命名规范
 3 资源文件规范
 4 版本统一规范
-5 第三方库规范
-6 注释规范
-7 其他的一些规范
-
-1 前言为了利于项目维护以及规范开发，促进成员之间Code Review的效率，故提出以下开发规范">
+5 第三方库规范">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
@@ -268,11 +256,11 @@
 <li><a href="#2-命名规范">2 命名规范</a></li>
 <li><a href="#3-资源文件规范">3 资源文件规范</a></li>
 <li><a href="#4-版本统一规范">4 版本统一规范</a></li>
-<li><a href="#5-第三方库规范">5 第三方库规范</a></li>
+<li><a href="#5-第三方库规范">5 第三方库规范</a><a id="more"></a></li>
 <li><a href="#6-注释规范">6 注释规范</a></li>
 <li><a href="#7-其他的一些规范">7 其他的一些规范</a></li>
 </ul>
-<h3 id="1-前言"><a href="#1-前言" class="headerlink" title="1 前言"></a>1 前言</h3><p>为了利于项目维护以及规范开发，促进成员之间Code Review的效率，故提出以下开发规范<br><a id="more"></a></p>
+<h3 id="1-前言"><a href="#1-前言" class="headerlink" title="1 前言"></a>1 前言</h3><p>为了利于项目维护以及规范开发，促进成员之间Code Review的效率，故提出以下开发规范</p>
 <h3 id="2-命名规范"><a href="#2-命名规范" class="headerlink" title="2 命名规范"></a>2 命名规范</h3><p>代码中的命名严禁使用拼音与英文混合的方式,更不允许直接使用中文的方式。正确的英文拼写和语法可以让阅读者易于理解,避免歧义。</p>
 <blockquote>
 <p>注意：即使纯拼音命名方式也要避免采用。但<code>alibaba</code>、<code>taobao</code>、<code>youku</code>、<code>hangzhou</code>等国际通用的名称,可视同英文。</p>
@@ -806,7 +794,7 @@
 <h4 id="6-1-类注释"><a href="#6-1-类注释" class="headerlink" title="6.1 类注释"></a>6.1 类注释</h4><p>每个类完成后应该有作者姓名和联系方式的注释，对自己的代码负责。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * &lt;pre&gt;</div><div class="line"> *     author : Blankj</div><div class="line"> *     e-mail : xxx@xx</div><div class="line"> *     time   : 2017/03/07</div><div class="line"> *     desc   : xxxx描述</div><div class="line"> *     version: 1.0</div><div class="line"> * &lt;/pre&gt;</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WelcomeActivity</span> </span>&#123;</div><div class="line">       ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>具体可以在AS中自己配制，Settings → Editor → File and Code Templates → Includes → File Header，输入</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * &lt;pre&gt;</div><div class="line"> *     author : $&#123;USER&#125;</div><div class="line"> *     e-mail : xxx@xx</div><div class="line"> *     time   : $&#123;YEAR&#125;/$&#123;MONTH&#125;/$&#123;DAY&#125;</div><div class="line"> *     desc   : </div><div class="line"> *     version: 1.0</div><div class="line"> * &lt;/pre&gt;</div><div class="line"> */</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * &lt;pre&gt;</div><div class="line"> *     author : $&#123;USER&#125;</div><div class="line"> *     e-mail : xxx@xx</div><div class="line"> *     time   : $&#123;YEAR&#125;/$&#123;MONTH&#125;/$&#123;DAY&#125;</div><div class="line"> *     desc   :</div><div class="line"> *     version: 1.0</div><div class="line"> * &lt;/pre&gt;</div><div class="line"> */</div></pre></td></tr></table></figure>
 <p>这样便可在每次新建类的时候自动加上该头注释。</p>
 <h4 id="6-2-方法注释"><a href="#6-2-方法注释" class="headerlink" title="6.2 方法注释"></a>6.2 方法注释</h4><p>每一个成员方法（包括自定义成员方法、覆盖方法、属性方法）的方法头都必须做方法头注释，在方法前一行输入<code>/** + 回车</code>或者设置<code>Fix doc comment</code>(Settings → Keymap → Fix doc comment)快捷键，AS便会帮你生成模板，我们只需要补全参数即可，如下所示。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * bitmap转byteArr</div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> bitmap bitmap对象</div><div class="line"> * <span class="doctag">@param</span> format 格式</div><div class="line"> * <span class="doctag">@return</span> 字节数组</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span>[] bitmap2Bytes(Bitmap bitmap, CompressFormat format) &#123;</div><div class="line">    <span class="keyword">if</span> (bitmap == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    ByteArrayOutputStream baos = <span class="keyword">new</span> ByteArrayOutputStream();</div><div class="line">    bitmap.compress(format, <span class="number">100</span>, baos);</div><div class="line">    <span class="keyword">return</span> baos.toByteArray();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -1050,7 +1038,7 @@
         <p><span>本文标题:</span><a href="/2017/03/10/Android开发规范/">Android开发规范</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">feifei</a></p>
         <p><span>发布时间:</span>2017-03-10, 11:31:27</p>
-        <p><span>最后更新:</span>2017-03-12, 01:06:04</p>
+        <p><span>最后更新:</span>2017-03-13, 17:05:00</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2017/03/10/Android开发规范/" title="Android开发规范">http://yoursite.com/2017/03/10/Android开发规范/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2017/03/10/Android开发规范/　　作者: feifei" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>

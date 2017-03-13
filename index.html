@@ -233,7 +233,7 @@
       
           
               <h4 id="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："><a href="#在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：" class="headerlink" title="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："></a>在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：</h4><p><div align=center><br><img src="http://i1.piimg.com/567571/0282ddefcac2c362.png" alt="Java程序执行过程"><br></div></p>
-<h4 id="Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。-我们今天就来分析一下Java程序执行过程的-Runtime-Data-Area（运行时数据）-这一块"><a href="#Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。-我们今天就来分析一下Java程序执行过程的-Runtime-Data-Area（运行时数据）-这一块" class="headerlink" title="Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。 我们今天就来分析一下Java程序执行过程的  Runtime Data Area（运行时数据）  这一块"></a>Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。 我们今天就来分析一下Java程序执行过程的  <strong>Runtime Data Area（运行时数据）</strong>  这一块</h4>
+<h4 id="Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。-我们今天就来分析一下Java程序执行过程的-Runtime-Data-Area（运行时数据）-这一块"><a href="#Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。-我们今天就来分析一下Java程序执行过程的-Runtime-Data-Area（运行时数据）-这一块" class="headerlink" title="Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。 我们今天就来分析一下Java程序执行过程的  Runtime Data Area（运行时数据）  这一块"></a>Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。 我们今天就来分析一下Java程序执行过程的  <strong>Runtime Data Area（运行时数据）</strong>  这一块</h4><h3 id="那么运行时数据区包括哪几部分呢？"><a href="#那么运行时数据区包括哪几部分呢？" class="headerlink" title="那么运行时数据区包括哪几部分呢？"></a>那么运行时数据区包括哪几部分呢？</h3>
           
       
     </div>
@@ -297,8 +297,8 @@
 <p>Maven 是一个项目管理和自动构建工具</p>
 <h2 id="那我们为什么要搭建Maven的私有仓库呢？"><a href="#那我们为什么要搭建Maven的私有仓库呢？" class="headerlink" title="那我们为什么要搭建Maven的私有仓库呢？"></a>那我们为什么要搭建Maven的私有仓库呢？</h2><ul>
 <li><strong>有的公司不能访问外网，故通过搭建私有仓库来管理库文件、插件等；</strong></li>
-<li><strong>有的公司网速比较慢，故可以通过搭建私有仓库来获取库文件或者插件，速度比较快；</strong> </li>
-<li><strong>有的公司经常会开发一些常用工具或者组件，故可以通过搭建私有仓库来共享给其他开发者，有利于统一维护和管理。</strong><h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><h3 id="1、JDK-1-8"><a href="#1、JDK-1-8" class="headerlink" title="1、JDK 1.8"></a>1、JDK 1.8</h3><h5 id="一般做Android开发都有搭建，没有的，自行百度教程"><a href="#一般做Android开发都有搭建，没有的，自行百度教程" class="headerlink" title="一般做Android开发都有搭建，没有的，自行百度教程"></a>一般做Android开发都有搭建，没有的，自行百度教程</h5>
+<li><strong>有的公司网速比较慢，故可以通过搭建私有仓库来获取库文件或者插件，速度比较快；</strong></li>
+<li><strong>有的公司经常会开发一些常用工具或者组件，故可以通过搭建私有仓库来共享给其他开发者，有利于统一维护和管理。</strong><h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2>
           
       
     </div>
@@ -363,11 +363,7 @@
 <li><a href="#2-命名规范">2 命名规范</a></li>
 <li><a href="#3-资源文件规范">3 资源文件规范</a></li>
 <li><a href="#4-版本统一规范">4 版本统一规范</a></li>
-<li><a href="#5-第三方库规范">5 第三方库规范</a></li>
-<li><a href="#6-注释规范">6 注释规范</a></li>
-<li><a href="#7-其他的一些规范">7 其他的一些规范</a></li>
-</ul>
-<h3 id="1-前言"><a href="#1-前言" class="headerlink" title="1 前言"></a>1 前言</h3><p>为了利于项目维护以及规范开发，促进成员之间Code Review的效率，故提出以下开发规范<br>
+<li><a href="#5-第三方库规范">5 第三方库规范</a>
           
       
     </div>
