@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="feifei" />
+
+
+
+<meta name="description" content="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：
+Java 程序的执行过程：Java 源代码文件（.Java文件）-&amp;gt; Java Compiler（Java编译器）-&amp;gt;Java 字节码文件（.class文件）-&amp;gt;类加载器（Class Loader）-&amp;gt;Runtime Data Area（运行时数据）-&amp;gt; Execution Engine（执行引擎）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入了解Java之虚拟机内存">
+<meta property="og:url" content="http://yoursite.com/2017/03/13/深入了解Java之虚拟机内存/index.html">
+<meta property="og:site_name" content="feifei">
+<meta property="og:description" content="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：
+Java 程序的执行过程：Java 源代码文件（.Java文件）-&amp;gt; Java Compiler（Java编译器）-&amp;gt;Java 字节码文件（.class文件）-&amp;gt;类加载器（Class Loader）-&amp;gt;Runtime Data Area（运行时数据）-&amp;gt; Execution Engine（执行引擎）">
+<meta property="og:image" content="http://i1.piimg.com/567571/0282ddefcac2c362.png">
+<meta property="og:updated_time" content="2017-03-13T09:02:51.267Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入了解Java之虚拟机内存">
+<meta name="twitter:description" content="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：
+Java 程序的执行过程：Java 源代码文件（.Java文件）-&amp;gt; Java Compiler（Java编译器）-&amp;gt;Java 字节码文件（.class文件）-&amp;gt;类加载器（Class Loader）-&amp;gt;Runtime Data Area（运行时数据）-&amp;gt; Execution Engine（执行引擎）">
+<meta name="twitter:image" content="http://i1.piimg.com/567571/0282ddefcac2c362.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="feifei" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>深入了解Java之虚拟机内存 | feifei</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: undefined
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "//hm.baidu.com/hm.js?f38c3a56e96035e0d13d8fa3ea34df43";
+            var s = document.getElementsByTagName("script")[0]; 
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">feifei</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">人有上进心，一切都会很阳光！</p>
+        
+
+        
+
+
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" href="https://github.com/cwjfeifei" title="GitHub"></a>
+                            
+                                <a class="fa 简书" href="http://www.jianshu.com/u/d699ba5d8528" title="简书"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                
+                
+
+                
+                
+                <section class="switch-part switch-part3">
+                
+                    <div id="js-aboutme">一个不折不扣的技术控，也很喜欢运动的Android小菜鸟</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">feifei</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">feifei</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">人有上进心，一切都会很阳光！</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/cwjfeifei" title="GitHub"></a>
+                            
+                                <a class="fa 简书" target="_blank" href="http://www.jianshu.com/u/d699ba5d8528" title="简书"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-深入了解Java之虚拟机内存" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/03/13/深入了解Java之虚拟机内存/" class="article-date">
+      <time datetime="2017-03-13T09:03:03.128Z" itemprop="datePublished">2017-03-13</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      深入了解Java之虚拟机内存
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h4 id="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："><a href="#在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：" class="headerlink" title="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："></a>在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：</h4><p><div align="center"><br><img src="http://i1.piimg.com/567571/0282ddefcac2c362.png" alt="Java程序执行过程"><br></div></p>
+<h4 id="Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。-我们今天就来分析一下Java程序执行过程的-Runtime-Data-Area（运行时数据）-这一块"><a href="#Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。-我们今天就来分析一下Java程序执行过程的-Runtime-Data-Area（运行时数据）-这一块" class="headerlink" title="Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。 我们今天就来分析一下Java程序执行过程的  Runtime Data Area（运行时数据）  这一块"></a>Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。 我们今天就来分析一下Java程序执行过程的  <strong>Runtime Data Area（运行时数据）</strong>  这一块</h4><a id="more"></a>
+<h3 id="那么运行时数据区包括哪几部分呢？"><a href="#那么运行时数据区包括哪几部分呢？" class="headerlink" title="那么运行时数据区包括哪几部分呢？"></a>那么运行时数据区包括哪几部分呢？</h3><ul>
+<li><strong>程序计数器（Program Counter Register）</strong></li>
+<li><strong>Java虚拟机栈（VM Stack）</strong></li>
+<li><strong>本地方法栈（Native Method Stack）</strong></li>
+<li><strong>方法区（method area）</strong></li>
+<li><strong>堆（heap）</strong></li>
+</ul>
+<h2 id="一、程序计数器"><a href="#一、程序计数器" class="headerlink" title="一、程序计数器"></a>一、程序计数器</h2><h4 id="用来指示程序执行哪一条指令，这跟汇编语言的程序计数器的功能在逻辑上是一样的。JVM规范中规定，如果线程执行的是非native方法，则程序计数器中保存的是当前需要执行的指令地址，如果线程执行的是native方法，则程序计数器中的值undefined。每个线程都有自己独立的程序计数器。为什么呢？因为多线程下，一个CPU内核只会执行一条线程中的指令，因此为了使每个线程在线程切换之后能够恢复到切换之前的程序执行的位置，所以每个线程都有自己独立的程序计数器。"><a href="#用来指示程序执行哪一条指令，这跟汇编语言的程序计数器的功能在逻辑上是一样的。JVM规范中规定，如果线程执行的是非native方法，则程序计数器中保存的是当前需要执行的指令地址，如果线程执行的是native方法，则程序计数器中的值undefined。每个线程都有自己独立的程序计数器。为什么呢？因为多线程下，一个CPU内核只会执行一条线程中的指令，因此为了使每个线程在线程切换之后能够恢复到切换之前的程序执行的位置，所以每个线程都有自己独立的程序计数器。" class="headerlink" title="用来指示程序执行哪一条指令，这跟汇编语言的程序计数器的功能在逻辑上是一样的。JVM规范中规定，如果线程执行的是非native方法，则程序计数器中保存的是当前需要执行的指令地址，如果线程执行的是native方法，则程序计数器中的值undefined。每个线程都有自己独立的程序计数器。为什么呢？因为多线程下，一个CPU内核只会执行一条线程中的指令，因此为了使每个线程在线程切换之后能够恢复到切换之前的程序执行的位置，所以每个线程都有自己独立的程序计数器。"></a>用来指示程序执行哪一条指令，这跟汇编语言的程序计数器的功能在逻辑上是一样的。JVM规范中规定，如果线程执行的是非native方法，则程序计数器中保存的是当前需要执行的指令地址，如果线程执行的是native方法，则程序计数器中的值undefined。每个线程都有自己独立的程序计数器。为什么呢？因为多线程下，一个CPU内核只会执行一条线程中的指令，因此为了使每个线程在线程切换之后能够恢复到切换之前的程序执行的位置，所以每个线程都有自己独立的程序计数器。</h4><h2 id="二、Java虚拟机栈"><a href="#二、Java虚拟机栈" class="headerlink" title="二、Java虚拟机栈"></a>二、Java虚拟机栈</h2><h4 id="Java虚拟机栈中存放的是一个个栈帧，当程序执行一个方法时，就会创建一个栈帧并压入栈中，当方法执行完毕之后，便会将栈帧移除栈。我们所说的“栈”是指Java虚拟机栈，一个栈帧中包括：局部变量表、操作数栈、动态连接、方法返回地址、附加信息"><a href="#Java虚拟机栈中存放的是一个个栈帧，当程序执行一个方法时，就会创建一个栈帧并压入栈中，当方法执行完毕之后，便会将栈帧移除栈。我们所说的“栈”是指Java虚拟机栈，一个栈帧中包括：局部变量表、操作数栈、动态连接、方法返回地址、附加信息" class="headerlink" title="Java虚拟机栈中存放的是一个个栈帧，当程序执行一个方法时，就会创建一个栈帧并压入栈中，当方法执行完毕之后，便会将栈帧移除栈。我们所说的“栈”是指Java虚拟机栈，一个栈帧中包括：局部变量表、操作数栈、动态连接、方法返回地址、附加信息"></a>Java虚拟机栈中存放的是一个个栈帧，当程序执行一个方法时，就会创建一个栈帧并压入栈中，当方法执行完毕之后，便会将栈帧移除栈。我们所说的“栈”是指Java虚拟机栈，一个栈帧中包括：局部变量表、操作数栈、动态连接、方法返回地址、附加信息</h4><h3 id="1、局部变量表"><a href="#1、局部变量表" class="headerlink" title="1、局部变量表"></a>1、局部变量表</h3><h4 id="主要是存储方法中的局部变量，包括方法中局部变量的信息和方法的参数。如：各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（reference类型，它不等同于对象本身，可能是一个指向对象起始地址的引用指针，也可能是指向一个代表对象的句柄或其他与此对象相关的位置）和returnAddress类型（指向了一条字节码指令的地址），其中64位长度的long和double类型的数据会占用2个局部变量空间（Slot），其余的数据类型只占用1个。局部变量表的大小在编译器就可以确定其大小了，因此在程序执行期间局部变量表的大小是不会改变的。在Java虚拟机规范中，对这个区域规定了两种异常状况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常；如果虚拟机栈可以动态扩展（当前大部分的Java虚拟机都可动态扩展，只不过Java虚拟机规范中也允许固定长度的虚拟机栈），如果扩展时无法申请到足够的内存，就会抛出OutOfMemoryError异常。"><a href="#主要是存储方法中的局部变量，包括方法中局部变量的信息和方法的参数。如：各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（reference类型，它不等同于对象本身，可能是一个指向对象起始地址的引用指针，也可能是指向一个代表对象的句柄或其他与此对象相关的位置）和returnAddress类型（指向了一条字节码指令的地址），其中64位长度的long和double类型的数据会占用2个局部变量空间（Slot），其余的数据类型只占用1个。局部变量表的大小在编译器就可以确定其大小了，因此在程序执行期间局部变量表的大小是不会改变的。在Java虚拟机规范中，对这个区域规定了两种异常状况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常；如果虚拟机栈可以动态扩展（当前大部分的Java虚拟机都可动态扩展，只不过Java虚拟机规范中也允许固定长度的虚拟机栈），如果扩展时无法申请到足够的内存，就会抛出OutOfMemoryError异常。" class="headerlink" title="主要是存储方法中的局部变量，包括方法中局部变量的信息和方法的参数。如：各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（reference类型，它不等同于对象本身，可能是一个指向对象起始地址的引用指针，也可能是指向一个代表对象的句柄或其他与此对象相关的位置）和returnAddress类型（指向了一条字节码指令的地址），其中64位长度的long和double类型的数据会占用2个局部变量空间（Slot），其余的数据类型只占用1个。局部变量表的大小在编译器就可以确定其大小了，因此在程序执行期间局部变量表的大小是不会改变的。在Java虚拟机规范中，对这个区域规定了两种异常状况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常；如果虚拟机栈可以动态扩展（当前大部分的Java虚拟机都可动态扩展，只不过Java虚拟机规范中也允许固定长度的虚拟机栈），如果扩展时无法申请到足够的内存，就会抛出OutOfMemoryError异常。"></a>主要是存储方法中的局部变量，包括方法中局部变量的信息和方法的参数。如：各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（reference类型，它不等同于对象本身，可能是一个指向对象起始地址的引用指针，也可能是指向一个代表对象的句柄或其他与此对象相关的位置）和returnAddress类型（指向了一条字节码指令的地址），其中64位长度的long和double类型的数据会占用2个局部变量空间（Slot），其余的数据类型只占用1个。局部变量表的大小在编译器就可以确定其大小了，因此在程序执行期间局部变量表的大小是不会改变的。在Java虚拟机规范中，对这个区域规定了两种异常状况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常；如果虚拟机栈可以动态扩展（当前大部分的Java虚拟机都可动态扩展，只不过Java虚拟机规范中也允许固定长度的虚拟机栈），如果扩展时无法申请到足够的内存，就会抛出OutOfMemoryError异常。</h4><h3 id="操作数栈"><a href="#操作数栈" class="headerlink" title="操作数栈"></a>操作数栈</h3><h4 id="虚拟机把操作数栈作为它的工作区，程序中的所有计算过程都是在借助于操作数栈来完成的，大多数指令都要从这里弹出数据，执行运算，然后把结果压回操作数栈。"><a href="#虚拟机把操作数栈作为它的工作区，程序中的所有计算过程都是在借助于操作数栈来完成的，大多数指令都要从这里弹出数据，执行运算，然后把结果压回操作数栈。" class="headerlink" title="虚拟机把操作数栈作为它的工作区，程序中的所有计算过程都是在借助于操作数栈来完成的，大多数指令都要从这里弹出数据，执行运算，然后把结果压回操作数栈。"></a>虚拟机把操作数栈作为它的工作区，程序中的所有计算过程都是在借助于操作数栈来完成的，大多数指令都要从这里弹出数据，执行运算，然后把结果压回操作数栈。</h4><h3 id="动态连接"><a href="#动态连接" class="headerlink" title="动态连接"></a>动态连接</h3><h4 id="每个栈帧都包含一个指向运行时常量池中该栈帧所属方法的引用（指向运行时常量池：在方法执行的过程中有可能需要用到类中的常量），持有这个引用是为了支持方法调用过程中的动态连接"><a href="#每个栈帧都包含一个指向运行时常量池中该栈帧所属方法的引用（指向运行时常量池：在方法执行的过程中有可能需要用到类中的常量），持有这个引用是为了支持方法调用过程中的动态连接" class="headerlink" title="每个栈帧都包含一个指向运行时常量池中该栈帧所属方法的引用（指向运行时常量池：在方法执行的过程中有可能需要用到类中的常量），持有这个引用是为了支持方法调用过程中的动态连接"></a>每个栈帧都包含一个指向运行时常量池中该栈帧所属方法的引用（指向运行时常量池：在方法执行的过程中有可能需要用到类中的常量），持有这个引用是为了支持方法调用过程中的动态连接</h4><h3 id="方法返回地址"><a href="#方法返回地址" class="headerlink" title="方法返回地址"></a>方法返回地址</h3><h4 id="当一个方法执行完毕之后，要返回之前调用它的地方，因此在栈帧中必须保存一个方法返回地址。"><a href="#当一个方法执行完毕之后，要返回之前调用它的地方，因此在栈帧中必须保存一个方法返回地址。" class="headerlink" title="当一个方法执行完毕之后，要返回之前调用它的地方，因此在栈帧中必须保存一个方法返回地址。"></a>当一个方法执行完毕之后，要返回之前调用它的地方，因此在栈帧中必须保存一个方法返回地址。</h4><h3 id="附加信息"><a href="#附加信息" class="headerlink" title="附加信息"></a>附加信息</h3><h4 id="虚拟机规范允许具体的虚拟机实现增加一些规范里没有描述的信息到栈帧中，例如与高度相关的信息，这部分信息完全取决于具体的虚拟机实现。在实际开发中，一般会把动态连接，方法返回地址与其它附加信息全部归为一类，称为栈帧信息。"><a href="#虚拟机规范允许具体的虚拟机实现增加一些规范里没有描述的信息到栈帧中，例如与高度相关的信息，这部分信息完全取决于具体的虚拟机实现。在实际开发中，一般会把动态连接，方法返回地址与其它附加信息全部归为一类，称为栈帧信息。" class="headerlink" title="虚拟机规范允许具体的虚拟机实现增加一些规范里没有描述的信息到栈帧中，例如与高度相关的信息，这部分信息完全取决于具体的虚拟机实现。在实际开发中，一般会把动态连接，方法返回地址与其它附加信息全部归为一类，称为栈帧信息。"></a>虚拟机规范允许具体的虚拟机实现增加一些规范里没有描述的信息到栈帧中，例如与高度相关的信息，这部分信息完全取决于具体的虚拟机实现。在实际开发中，一般会把动态连接，方法返回地址与其它附加信息全部归为一类，称为栈帧信息。</h4><h2 id="三、本地方法栈、"><a href="#三、本地方法栈、" class="headerlink" title="三、本地方法栈、"></a>三、本地方法栈、</h2><h4 id="本地方法栈（Native-Method-Stack）与虚拟机栈所发挥的作用是非常相似的，它们之间的区别不过是虚拟机栈为虚拟机执行Java方法（也就是字节码）服务，而本地方法栈则为虚拟机使用到的Native方法服务。与虚拟机栈一样，本地方法栈区域也会抛出StackOverflowError和OutOfMemoryError异常。"><a href="#本地方法栈（Native-Method-Stack）与虚拟机栈所发挥的作用是非常相似的，它们之间的区别不过是虚拟机栈为虚拟机执行Java方法（也就是字节码）服务，而本地方法栈则为虚拟机使用到的Native方法服务。与虚拟机栈一样，本地方法栈区域也会抛出StackOverflowError和OutOfMemoryError异常。" class="headerlink" title="本地方法栈（Native Method Stack）与虚拟机栈所发挥的作用是非常相似的，它们之间的区别不过是虚拟机栈为虚拟机执行Java方法（也就是字节码）服务，而本地方法栈则为虚拟机使用到的Native方法服务。与虚拟机栈一样，本地方法栈区域也会抛出StackOverflowError和OutOfMemoryError异常。"></a>本地方法栈（Native Method Stack）与虚拟机栈所发挥的作用是非常相似的，它们之间的区别不过是虚拟机栈为虚拟机执行Java方法（也就是字节码）服务，而本地方法栈则为虚拟机使用到的Native方法服务。与虚拟机栈一样，本地方法栈区域也会抛出StackOverflowError和OutOfMemoryError异常。</h4><h2 id="四、堆（heap）"><a href="#四、堆（heap）" class="headerlink" title="四、堆（heap）"></a>四、堆（heap）</h2><h4 id="在C语言中，程序员可以通过malloc函数和free函数在堆上申请和释放空间。那么在Java中是怎么样的呢？Java中的堆是用来存储对象本身的以及数组（当然，数组引用是存放在Java栈中的），几乎所有的对象实例都在这里分配内存。在Java中，程序员基本不用去关心空间释放的问题，Java的垃圾回收机制会自动进行处理。另外，堆是被所有线程共享的，在JVM中只有一个堆。"><a href="#在C语言中，程序员可以通过malloc函数和free函数在堆上申请和释放空间。那么在Java中是怎么样的呢？Java中的堆是用来存储对象本身的以及数组（当然，数组引用是存放在Java栈中的），几乎所有的对象实例都在这里分配内存。在Java中，程序员基本不用去关心空间释放的问题，Java的垃圾回收机制会自动进行处理。另外，堆是被所有线程共享的，在JVM中只有一个堆。" class="headerlink" title="在C语言中，程序员可以通过malloc函数和free函数在堆上申请和释放空间。那么在Java中是怎么样的呢？Java中的堆是用来存储对象本身的以及数组（当然，数组引用是存放在Java栈中的），几乎所有的对象实例都在这里分配内存。在Java中，程序员基本不用去关心空间释放的问题，Java的垃圾回收机制会自动进行处理。另外，堆是被所有线程共享的，在JVM中只有一个堆。"></a>在C语言中，程序员可以通过malloc函数和free函数在堆上申请和释放空间。那么在Java中是怎么样的呢？Java中的堆是用来存储对象本身的以及数组（当然，数组引用是存放在Java栈中的），几乎所有的对象实例都在这里分配内存。在Java中，程序员基本不用去关心空间释放的问题，Java的垃圾回收机制会自动进行处理。另外，堆是被所有线程共享的，在JVM中只有一个堆。</h4><h2 id="五、方法区"><a href="#五、方法区" class="headerlink" title="五、方法区"></a>五、方法区</h2><h4 id="方法区（Method-Area）与Java堆一样，是各个线程共享的内存区域，它用于存储已被虚拟机加载的类信息、常量、静态变量、以及编译器编译后的代码等。运行时常量池（Runtime-Constant-Pool）是方法区的一部分。Class文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池（Constant-Pool-Table），用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。在JVM规范中，没有强制要求方法区必须实现垃圾回收。很多人习惯将方法区称为“永久代”，是因为HotSpot虚拟机以永久代来实现方法区，从而JVM的垃圾收集器可以像管理堆区一样管理这部分区域，从而不需要专门为这部分设计垃圾回收机制。不过自从JDK7之后，Hotspot虚拟机便将运行时常量池从永久代移除了。"><a href="#方法区（Method-Area）与Java堆一样，是各个线程共享的内存区域，它用于存储已被虚拟机加载的类信息、常量、静态变量、以及编译器编译后的代码等。运行时常量池（Runtime-Constant-Pool）是方法区的一部分。Class文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池（Constant-Pool-Table），用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。在JVM规范中，没有强制要求方法区必须实现垃圾回收。很多人习惯将方法区称为“永久代”，是因为HotSpot虚拟机以永久代来实现方法区，从而JVM的垃圾收集器可以像管理堆区一样管理这部分区域，从而不需要专门为这部分设计垃圾回收机制。不过自从JDK7之后，Hotspot虚拟机便将运行时常量池从永久代移除了。" class="headerlink" title="方法区（Method Area）与Java堆一样，是各个线程共享的内存区域，它用于存储已被虚拟机加载的类信息、常量、静态变量、以及编译器编译后的代码等。运行时常量池（Runtime Constant Pool）是方法区的一部分。Class文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池（Constant Pool Table），用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。在JVM规范中，没有强制要求方法区必须实现垃圾回收。很多人习惯将方法区称为“永久代”，是因为HotSpot虚拟机以永久代来实现方法区，从而JVM的垃圾收集器可以像管理堆区一样管理这部分区域，从而不需要专门为这部分设计垃圾回收机制。不过自从JDK7之后，Hotspot虚拟机便将运行时常量池从永久代移除了。"></a>方法区（Method Area）与Java堆一样，是各个线程共享的内存区域，它用于存储已被虚拟机加载的类信息、常量、静态变量、以及编译器编译后的代码等。运行时常量池（Runtime Constant Pool）是方法区的一部分。Class文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池（Constant Pool Table），用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。在JVM规范中，没有强制要求方法区必须实现垃圾回收。很多人习惯将方法区称为“永久代”，是因为HotSpot虚拟机以永久代来实现方法区，从而JVM的垃圾收集器可以像管理堆区一样管理这部分区域，从而不需要专门为这部分设计垃圾回收机制。不过自从JDK7之后，Hotspot虚拟机便将运行时常量池从永久代移除了。</h4><blockquote>
+<h3 id="注意：native方法是指：指使用-Java-以外的其他语言编写的方法"><a href="#注意：native方法是指：指使用-Java-以外的其他语言编写的方法" class="headerlink" title="注意：native方法是指：指使用 Java 以外的其他语言编写的方法"></a>注意：native方法是指：指使用 Java 以外的其他语言编写的方法</h3></blockquote>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2017/03/13/深入了解Java之虚拟机内存/">深入了解Java之虚拟机内存</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">feifei</a></p>
+        <p><span>发布时间:</span>2017-03-13, 17:03:03</p>
+        <p><span>最后更新:</span>2017-03-13, 17:02:51</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/03/13/深入了解Java之虚拟机内存/" title="深入了解Java之虚拟机内存">http://yoursite.com/2017/03/13/深入了解Java之虚拟机内存/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2017/03/13/深入了解Java之虚拟机内存/　　作者: feifei" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2017/03/12/Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7/">
+                    Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："><span class="toc-number">1.</span> <span class="toc-text">在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。-我们今天就来分析一下Java程序执行过程的-Runtime-Data-Area（运行时数据）-这一块"><span class="toc-number">2.</span> <span class="toc-text">Java 程序的执行过程：Java 源代码文件（.Java文件）-> Java Compiler（Java编译器）->Java 字节码文件（.class文件）->类加载器（Class Loader）->Runtime Data Area（运行时数据）-> Execution Engine（执行引擎）。 我们今天就来分析一下Java程序执行过程的  Runtime Data Area（运行时数据）  这一块</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#那么运行时数据区包括哪几部分呢？"><span class="toc-number"></span> <span class="toc-text">那么运行时数据区包括哪几部分呢？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一、程序计数器"><span class="toc-number"></span> <span class="toc-text">一、程序计数器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#用来指示程序执行哪一条指令，这跟汇编语言的程序计数器的功能在逻辑上是一样的。JVM规范中规定，如果线程执行的是非native方法，则程序计数器中保存的是当前需要执行的指令地址，如果线程执行的是native方法，则程序计数器中的值undefined。每个线程都有自己独立的程序计数器。为什么呢？因为多线程下，一个CPU内核只会执行一条线程中的指令，因此为了使每个线程在线程切换之后能够恢复到切换之前的程序执行的位置，所以每个线程都有自己独立的程序计数器。"><span class="toc-number">1.</span> <span class="toc-text">用来指示程序执行哪一条指令，这跟汇编语言的程序计数器的功能在逻辑上是一样的。JVM规范中规定，如果线程执行的是非native方法，则程序计数器中保存的是当前需要执行的指令地址，如果线程执行的是native方法，则程序计数器中的值undefined。每个线程都有自己独立的程序计数器。为什么呢？因为多线程下，一个CPU内核只会执行一条线程中的指令，因此为了使每个线程在线程切换之后能够恢复到切换之前的程序执行的位置，所以每个线程都有自己独立的程序计数器。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、Java虚拟机栈"><span class="toc-number"></span> <span class="toc-text">二、Java虚拟机栈</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Java虚拟机栈中存放的是一个个栈帧，当程序执行一个方法时，就会创建一个栈帧并压入栈中，当方法执行完毕之后，便会将栈帧移除栈。我们所说的“栈”是指Java虚拟机栈，一个栈帧中包括：局部变量表、操作数栈、动态连接、方法返回地址、附加信息"><span class="toc-number">1.</span> <span class="toc-text">Java虚拟机栈中存放的是一个个栈帧，当程序执行一个方法时，就会创建一个栈帧并压入栈中，当方法执行完毕之后，便会将栈帧移除栈。我们所说的“栈”是指Java虚拟机栈，一个栈帧中包括：局部变量表、操作数栈、动态连接、方法返回地址、附加信息</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1、局部变量表"><span class="toc-number"></span> <span class="toc-text">1、局部变量表</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#主要是存储方法中的局部变量，包括方法中局部变量的信息和方法的参数。如：各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（reference类型，它不等同于对象本身，可能是一个指向对象起始地址的引用指针，也可能是指向一个代表对象的句柄或其他与此对象相关的位置）和returnAddress类型（指向了一条字节码指令的地址），其中64位长度的long和double类型的数据会占用2个局部变量空间（Slot），其余的数据类型只占用1个。局部变量表的大小在编译器就可以确定其大小了，因此在程序执行期间局部变量表的大小是不会改变的。在Java虚拟机规范中，对这个区域规定了两种异常状况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常；如果虚拟机栈可以动态扩展（当前大部分的Java虚拟机都可动态扩展，只不过Java虚拟机规范中也允许固定长度的虚拟机栈），如果扩展时无法申请到足够的内存，就会抛出OutOfMemoryError异常。"><span class="toc-number">1.</span> <span class="toc-text">主要是存储方法中的局部变量，包括方法中局部变量的信息和方法的参数。如：各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（reference类型，它不等同于对象本身，可能是一个指向对象起始地址的引用指针，也可能是指向一个代表对象的句柄或其他与此对象相关的位置）和returnAddress类型（指向了一条字节码指令的地址），其中64位长度的long和double类型的数据会占用2个局部变量空间（Slot），其余的数据类型只占用1个。局部变量表的大小在编译器就可以确定其大小了，因此在程序执行期间局部变量表的大小是不会改变的。在Java虚拟机规范中，对这个区域规定了两种异常状况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常；如果虚拟机栈可以动态扩展（当前大部分的Java虚拟机都可动态扩展，只不过Java虚拟机规范中也允许固定长度的虚拟机栈），如果扩展时无法申请到足够的内存，就会抛出OutOfMemoryError异常。</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#操作数栈"><span class="toc-number"></span> <span class="toc-text">操作数栈</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#虚拟机把操作数栈作为它的工作区，程序中的所有计算过程都是在借助于操作数栈来完成的，大多数指令都要从这里弹出数据，执行运算，然后把结果压回操作数栈。"><span class="toc-number">1.</span> <span class="toc-text">虚拟机把操作数栈作为它的工作区，程序中的所有计算过程都是在借助于操作数栈来完成的，大多数指令都要从这里弹出数据，执行运算，然后把结果压回操作数栈。</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#动态连接"><span class="toc-number"></span> <span class="toc-text">动态连接</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#每个栈帧都包含一个指向运行时常量池中该栈帧所属方法的引用（指向运行时常量池：在方法执行的过程中有可能需要用到类中的常量），持有这个引用是为了支持方法调用过程中的动态连接"><span class="toc-number">1.</span> <span class="toc-text">每个栈帧都包含一个指向运行时常量池中该栈帧所属方法的引用（指向运行时常量池：在方法执行的过程中有可能需要用到类中的常量），持有这个引用是为了支持方法调用过程中的动态连接</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法返回地址"><span class="toc-number"></span> <span class="toc-text">方法返回地址</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#当一个方法执行完毕之后，要返回之前调用它的地方，因此在栈帧中必须保存一个方法返回地址。"><span class="toc-number">1.</span> <span class="toc-text">当一个方法执行完毕之后，要返回之前调用它的地方，因此在栈帧中必须保存一个方法返回地址。</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#附加信息"><span class="toc-number"></span> <span class="toc-text">附加信息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#虚拟机规范允许具体的虚拟机实现增加一些规范里没有描述的信息到栈帧中，例如与高度相关的信息，这部分信息完全取决于具体的虚拟机实现。在实际开发中，一般会把动态连接，方法返回地址与其它附加信息全部归为一类，称为栈帧信息。"><span class="toc-number">1.</span> <span class="toc-text">虚拟机规范允许具体的虚拟机实现增加一些规范里没有描述的信息到栈帧中，例如与高度相关的信息，这部分信息完全取决于具体的虚拟机实现。在实际开发中，一般会把动态连接，方法返回地址与其它附加信息全部归为一类，称为栈帧信息。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、本地方法栈、"><span class="toc-number"></span> <span class="toc-text">三、本地方法栈、</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#本地方法栈（Native-Method-Stack）与虚拟机栈所发挥的作用是非常相似的，它们之间的区别不过是虚拟机栈为虚拟机执行Java方法（也就是字节码）服务，而本地方法栈则为虚拟机使用到的Native方法服务。与虚拟机栈一样，本地方法栈区域也会抛出StackOverflowError和OutOfMemoryError异常。"><span class="toc-number">1.</span> <span class="toc-text">本地方法栈（Native Method Stack）与虚拟机栈所发挥的作用是非常相似的，它们之间的区别不过是虚拟机栈为虚拟机执行Java方法（也就是字节码）服务，而本地方法栈则为虚拟机使用到的Native方法服务。与虚拟机栈一样，本地方法栈区域也会抛出StackOverflowError和OutOfMemoryError异常。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、堆（heap）"><span class="toc-number"></span> <span class="toc-text">四、堆（heap）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#在C语言中，程序员可以通过malloc函数和free函数在堆上申请和释放空间。那么在Java中是怎么样的呢？Java中的堆是用来存储对象本身的以及数组（当然，数组引用是存放在Java栈中的），几乎所有的对象实例都在这里分配内存。在Java中，程序员基本不用去关心空间释放的问题，Java的垃圾回收机制会自动进行处理。另外，堆是被所有线程共享的，在JVM中只有一个堆。"><span class="toc-number">1.</span> <span class="toc-text">在C语言中，程序员可以通过malloc函数和free函数在堆上申请和释放空间。那么在Java中是怎么样的呢？Java中的堆是用来存储对象本身的以及数组（当然，数组引用是存放在Java栈中的），几乎所有的对象实例都在这里分配内存。在Java中，程序员基本不用去关心空间释放的问题，Java的垃圾回收机制会自动进行处理。另外，堆是被所有线程共享的，在JVM中只有一个堆。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#五、方法区"><span class="toc-number"></span> <span class="toc-text">五、方法区</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#方法区（Method-Area）与Java堆一样，是各个线程共享的内存区域，它用于存储已被虚拟机加载的类信息、常量、静态变量、以及编译器编译后的代码等。运行时常量池（Runtime-Constant-Pool）是方法区的一部分。Class文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池（Constant-Pool-Table），用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。在JVM规范中，没有强制要求方法区必须实现垃圾回收。很多人习惯将方法区称为“永久代”，是因为HotSpot虚拟机以永久代来实现方法区，从而JVM的垃圾收集器可以像管理堆区一样管理这部分区域，从而不需要专门为这部分设计垃圾回收机制。不过自从JDK7之后，Hotspot虚拟机便将运行时常量池从永久代移除了。"><span class="toc-number">1.</span> <span class="toc-text">方法区（Method Area）与Java堆一样，是各个线程共享的内存区域，它用于存储已被虚拟机加载的类信息、常量、静态变量、以及编译器编译后的代码等。运行时常量池（Runtime Constant Pool）是方法区的一部分。Class文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池（Constant Pool Table），用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。在JVM规范中，没有强制要求方法区必须实现垃圾回收。很多人习惯将方法区称为“永久代”，是因为HotSpot虚拟机以永久代来实现方法区，从而JVM的垃圾收集器可以像管理堆区一样管理这部分区域，从而不需要专门为这部分设计垃圾回收机制。不过自从JDK7之后，Hotspot虚拟机便将运行时常量池从永久代移除了。</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#注意：native方法是指：指使用-Java-以外的其他语言编写的方法"><span class="toc-number"></span> <span class="toc-text">注意：native方法是指：指使用 Java 以外的其他语言编写的方法</span></a>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"深入了解Java之虚拟机内存　| feifei　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+        <section class="youyan" id="comments">
+    <script>
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = 'http://v2.uyan.cc/code/uyan.js?uid=2127193';
+            (d.head || d.body).appendChild(s);
+        }
+    </script>
+    
+    <script> loadComment(); </script>
+
+    <div id="uyan_frame"></div>
+</section>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2017/03/12/Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7/" title="下一篇: Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/03/13/深入了解Java之虚拟机内存/">深入了解Java之虚拟机内存</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/12/Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7/">Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/10/Android开发规范/">Android开发规范</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/09/基于Glide的图片下载工具类，简单、高效/">基于Glide的图片下载工具类，简单、高效</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2017 feifei
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
