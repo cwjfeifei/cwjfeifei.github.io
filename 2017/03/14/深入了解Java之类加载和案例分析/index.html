@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="feifei" />
+
+
+
+<meta name="description" content="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：
+Java 程序的执行过程：Java 源代码文件（.Java文件）-&amp;gt; Java Compiler（Java编译器）-&amp;gt;Java 字节码文件（.class文件）-&amp;gt;类加载器（Class Loader）-&amp;gt;Runtime Data Area（运行时数据）-&amp;gt; Execution Engine（执行引擎）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入了解Java之类加载和案例分析">
+<meta property="og:url" content="http://yoursite.com/2017/03/14/深入了解Java之类加载和案例分析/index.html">
+<meta property="og:site_name" content="feifei">
+<meta property="og:description" content="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：
+Java 程序的执行过程：Java 源代码文件（.Java文件）-&amp;gt; Java Compiler（Java编译器）-&amp;gt;Java 字节码文件（.class文件）-&amp;gt;类加载器（Class Loader）-&amp;gt;Runtime Data Area（运行时数据）-&amp;gt; Execution Engine（执行引擎）">
+<meta property="og:image" content="http://i1.piimg.com/567571/0282ddefcac2c362.png">
+<meta property="og:updated_time" content="2017-03-14T07:08:40.906Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入了解Java之类加载和案例分析">
+<meta name="twitter:description" content="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：
+Java 程序的执行过程：Java 源代码文件（.Java文件）-&amp;gt; Java Compiler（Java编译器）-&amp;gt;Java 字节码文件（.class文件）-&amp;gt;类加载器（Class Loader）-&amp;gt;Runtime Data Area（运行时数据）-&amp;gt; Execution Engine（执行引擎）">
+<meta name="twitter:image" content="http://i1.piimg.com/567571/0282ddefcac2c362.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="feifei" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>深入了解Java之类加载和案例分析 | feifei</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: undefined
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "//hm.baidu.com/hm.js?f38c3a56e96035e0d13d8fa3ea34df43";
+            var s = document.getElementsByTagName("script")[0]; 
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">feifei</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">人有上进心，一切都会很阳光！</p>
+        
+
+        
+
+
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" href="https://github.com/cwjfeifei" title="GitHub"></a>
+                            
+                                <a class="fa 简书" href="http://www.jianshu.com/u/d699ba5d8528" title="简书"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                
+                
+
+                
+                
+                <section class="switch-part switch-part3">
+                
+                    <div id="js-aboutme">一个不折不扣的技术控，也很喜欢运动的Android小菜鸟</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">feifei</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">feifei</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">人有上进心，一切都会很阳光！</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/cwjfeifei" title="GitHub"></a>
+                            
+                                <a class="fa 简书" target="_blank" href="http://www.jianshu.com/u/d699ba5d8528" title="简书"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-深入了解Java之类加载和案例分析" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/03/14/深入了解Java之类加载和案例分析/" class="article-date">
+      <time datetime="2017-03-14T06:37:23.226Z" itemprop="datePublished">2017-03-14</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      深入了解Java之类加载和案例分析
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h4 id="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："><a href="#在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：" class="headerlink" title="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："></a>在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：</h4><p><div align="center"><br><img src="http://i1.piimg.com/567571/0282ddefcac2c362.png" alt="Java程序执行过程"><br></div></p>
+<h4 id="Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。上篇文章已经分析了-Runtime-Data-Area（运行时数据）-这一块，那我们今天就来分析一下Java程序执行过程的-类加载器（Class-Loader）-这一块"><a href="#Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。上篇文章已经分析了-Runtime-Data-Area（运行时数据）-这一块，那我们今天就来分析一下Java程序执行过程的-类加载器（Class-Loader）-这一块" class="headerlink" title="Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。上篇文章已经分析了 Runtime Data Area（运行时数据） 这一块，那我们今天就来分析一下Java程序执行过程的  类加载器（Class Loader）  这一块"></a>Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。上篇文章已经分析了 <strong>Runtime Data Area（运行时数据）</strong> 这一块，那我们今天就来分析一下Java程序执行过程的  <strong>类加载器（Class Loader）</strong>  这一块</h4><h2 id="一、类加载器（ClassLoader）"><a href="#一、类加载器（ClassLoader）" class="headerlink" title="一、类加载器（ClassLoader）"></a>一、类加载器（ClassLoader）</h2><h5 id="把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。"><a href="#把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。" class="headerlink" title="把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。"></a>把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。</h5><h3 id="学习这个有什么好处呢？"><a href="#学习这个有什么好处呢？" class="headerlink" title="学习这个有什么好处呢？"></a>学习这个有什么好处呢？</h3><a id="more"></a>
+<blockquote>
+<p>1、有助于了解Java虚拟机的执行过程</p>
+<p>2、程序能动态的控制类加载，比如热部署、热修复等</p>
+</blockquote>
+<h3 id="类加载器（ClassLoader）的一些方法："><a href="#类加载器（ClassLoader）的一些方法：" class="headerlink" title="类加载器（ClassLoader）的一些方法："></a>类加载器（ClassLoader）的一些方法：</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">方法</th>
+<th style="text-align:right">说明 　</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">getParent()</td>
+<td style="text-align:right">返回该类加载器的父类加载器</td>
+</tr>
+<tr>
+<td style="text-align:left">loadClass(String name)</td>
+<td style="text-align:right">加载名称为 name的类</td>
+</tr>
+<tr>
+<td style="text-align:left">findClass(String name)</td>
+<td style="text-align:right">查找名称为 name的类</td>
+</tr>
+<tr>
+<td style="text-align:left">findLoadedClass(String name)</td>
+<td style="text-align:right">查找名称为 name的已经被加载过的类</td>
+</tr>
+<tr>
+<td style="text-align:left">defineClass(String name, byte[] b, int off, int len)</td>
+<td style="text-align:right">把字节数组 b中的内容转换成 Java 类，返回的结果是 java.lang.Class类的实例。这个方法被声明为 final的</td>
+</tr>
+</tbody>
+</table>
+<h2 id="二、类加载的分类"><a href="#二、类加载的分类" class="headerlink" title="二、类加载的分类"></a>二、类加载的分类</h2><ul>
+<li><p>　<strong>Bootstrap Loader(启动类加载器)</strong> ：是用C++语言写的，是虚拟机自身的一部分，主要负责加载Java的核心类；</p>
+</li>
+<li><p>　<strong>Extended Loader(扩展类加载器)</strong> ：Extended Loader的父加载器为 Bootstrap Loader，该加载器使用Java写的，它用来加载Java的扩展库；</p>
+</li>
+<li><p>　<strong>AppClass Loader(系统类加载器)</strong>：AppClass Loader的父加载器为 Extended Loader，该加载器使用Java写的，它用来加载Java应用的类路径（CLASSPATH）上的类库。</p>
+</li>
+</ul>
+<h2 id="三、类加载过程"><a href="#三、类加载过程" class="headerlink" title="三、类加载过程"></a>三、类加载过程</h2><h5 id="寻找jre目录，寻找jvm-dll，并初始化JVM，JVM启动后，运行Bootstrap-Loader，该Bootstrap-Loader-启动类加载器-自动加载Extended-Loader（扩展类加载器）和AppClass-Loader（系统类加载器），最后AppClass-Loader加载CLASSPATH目录下定义的Class。"><a href="#寻找jre目录，寻找jvm-dll，并初始化JVM，JVM启动后，运行Bootstrap-Loader，该Bootstrap-Loader-启动类加载器-自动加载Extended-Loader（扩展类加载器）和AppClass-Loader（系统类加载器），最后AppClass-Loader加载CLASSPATH目录下定义的Class。" class="headerlink" title="寻找jre目录，寻找jvm.dll，并初始化JVM，JVM启动后，运行Bootstrap Loader，该Bootstrap Loader(启动类加载器)自动加载Extended Loader（扩展类加载器）和AppClass Loader（系统类加载器），最后AppClass Loader加载CLASSPATH目录下定义的Class。"></a>寻找jre目录，寻找jvm.dll，并初始化JVM，JVM启动后，运行Bootstrap Loader，该Bootstrap Loader(启动类加载器)自动加载Extended Loader（扩展类加载器）和AppClass Loader（系统类加载器），最后AppClass Loader加载CLASSPATH目录下定义的Class。</h5><h2 id="四、双亲委派模型"><a href="#四、双亲委派模型" class="headerlink" title="四、双亲委派模型"></a>四、双亲委派模型</h2><h5 id="如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上，因此，所有的类加载请求最终都应该被传递到顶层的启动类加载器中，只有当父加载器在它的搜索范围中没有找到所需的类时，即无法完成该加载，子加载器才会尝试自己去加载该类。"><a href="#如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上，因此，所有的类加载请求最终都应该被传递到顶层的启动类加载器中，只有当父加载器在它的搜索范围中没有找到所需的类时，即无法完成该加载，子加载器才会尝试自己去加载该类。" class="headerlink" title="如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上，因此，所有的类加载请求最终都应该被传递到顶层的启动类加载器中，只有当父加载器在它的搜索范围中没有找到所需的类时，即无法完成该加载，子加载器才会尝试自己去加载该类。"></a>如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上，因此，所有的类加载请求最终都应该被传递到顶层的启动类加载器中，只有当父加载器在它的搜索范围中没有找到所需的类时，即无法完成该加载，子加载器才会尝试自己去加载该类。</h5><h4 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现:"></a>代码实现:</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line">protected Class&lt;?&gt; loadClass(String name, boolean resolve)</div><div class="line">    throws ClassNotFoundException</div><div class="line">&#123;</div><div class="line">    synchronized (getClassLoadingLock(name)) &#123;</div><div class="line">        //检查该类是否已经加载过</div><div class="line">        Class c = findLoadedClass(name);</div><div class="line">        if (c == null) &#123;</div><div class="line">            //如果该类没有加载，则进入该分支</div><div class="line">            long t0 = System.nanoTime();</div><div class="line">            try &#123;</div><div class="line">                if (parent != null) &#123;</div><div class="line">                    //当父类的加载器不为空，则通过父类的loadClass来加载该类</div><div class="line">                    c = parent.loadClass(name, false);</div><div class="line">                &#125; else &#123;</div><div class="line">                    //当父类的加载器为空，则调用启动类加载器来加载该类</div><div class="line">                    c = findBootstrapClassOrNull(name);</div><div class="line">                &#125;</div><div class="line">            &#125; catch (ClassNotFoundException e) &#123;</div><div class="line">                //非空父类的类加载器无法找到相应的类，则抛出异常</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            if (c == null) &#123;</div><div class="line">                //当所有父类加载器无法加载时，则调用自己findClass方法来加载该类</div><div class="line">                long t1 = System.nanoTime();</div><div class="line">                c = findClass(name); //用户可通过覆写该方法，来自定义类加载器</div><div class="line"></div><div class="line">                //用于统计类加载器相关的信息</div><div class="line">                sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);</div><div class="line">                sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);</div><div class="line">                sun.misc.PerfCounter.getFindClasses().increment();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        if (resolve) &#123;</div><div class="line">            //对类进行link操作</div><div class="line">            resolveClass(c);</div><div class="line">        &#125;</div><div class="line">        return c;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="“双亲委派模型”有什么作用呢？"><a href="#“双亲委派模型”有什么作用呢？" class="headerlink" title="“双亲委派模型”有什么作用呢？"></a>“双亲委派模型”有什么作用呢？</h3><blockquote>
+<p>1、这样保证了每个类都只会加载一次</p>
+<p>2、维护系统自身类的安全</p>
+</blockquote>
+<h2 id="五、类加载的三种方式"><a href="#五、类加载的三种方式" class="headerlink" title="五、类加载的三种方式"></a>五、类加载的三种方式</h2><blockquote>
+<p> 1、通过JVM初始化加载</p>
+<p>2、通过Class.forName()方法动态加载</p>
+<p>3、通过ClassLoader.loadClass()方法动态加载</p>
+</blockquote>
+<h2 id="六、案例分析"><a href="#六、案例分析" class="headerlink" title="六、案例分析"></a>六、案例分析</h2><h4 id="基于上篇文章的”深入了解Java之虚拟机内存”和这篇”深入了解Java之类加载”的理论知识，我们用这个例子简单的来了解一下类的加载和内存分配的一些逻辑："><a href="#基于上篇文章的”深入了解Java之虚拟机内存”和这篇”深入了解Java之类加载”的理论知识，我们用这个例子简单的来了解一下类的加载和内存分配的一些逻辑：" class="headerlink" title="基于上篇文章的”深入了解Java之虚拟机内存”和这篇”深入了解Java之类加载”的理论知识，我们用这个例子简单的来了解一下类的加载和内存分配的一些逻辑："></a>基于上篇文章的”深入了解Java之虚拟机内存”和这篇”深入了解Java之类加载”的理论知识，我们用这个例子简单的来了解一下类的加载和内存分配的一些逻辑：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class TestMain &#123;</div><div class="line">     public void TestMethod() &#123;</div><div class="line">         Sample testSample = new Sample(&quot; test &quot;);</div><div class="line">         testSample.getName();</div><div class="line"></div><div class="line">     &#125;</div><div class="line"> &#125;</div><div class="line"> public class Sample &#123;</div><div class="line">     private String name;</div><div class="line">     public Sample(String name) &#123;</div><div class="line">         this.name = name;</div><div class="line">     &#125;</div><div class="line">     public void getName() &#123;</div><div class="line">         Log.i(&quot;Sample&quot;, &quot;name:&quot; + name);</div><div class="line">     &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<h3 id="过程分析"><a href="#过程分析" class="headerlink" title="过程分析"></a>过程分析</h3><p><code>public class TestMain</code></p>
+<blockquote>
+<p>通过JVM初始化加载；通过Class.forName()方法动态加载；通过ClassLoader.loadClass()方法动态加载通过以上方法加载这个类的时候，会从Bootstrap Loader（启动类加载器），Extended Loader（扩展类加载器）从上往下加载，发现都加载不了，最后由AppClass Loader从CLASSPATH中找到加载TestMain这个类,读取这个文件中的二进制数据,接着对这部分数据进行验证、准备、解析、初始化，最后会把这个类的类信息、常量、静态变量、以及编译器编译后的代码等存入运行时数据区中的方法区。</p>
+</blockquote>
+<p><code>public void TestMethod()</code></p>
+<blockquote>
+<p>TestMethod 也被放入方法区。</p>
+</blockquote>
+<p><code>Sample testSample = new Sample(&quot; test &quot;);</code></p>
+<blockquote>
+<p>先看”=”右边的：“new Sample(“ test “)”也是一个类跟上面一样，加载这个类的相关信息到方法区中，然后就是就是要在运行时数据区中的堆进行分配内存，方法区的类信息和堆怎么对应呢？其实堆只是存放了这个Sample实例的一个指向方法区的引用地址testSample，他主要是存放在运行时数据的Java虚拟机栈的栈帧中的局部变量表中”=”其实不是赋值，而是testSample这个变量指向了堆中的Sample实例</p>
+</blockquote>
+<p><code>testSample.getName();</code></p>
+<blockquote>
+<p>testSample指向了堆中Sample的实例，然后根据这个实例持有的引用拿到了方法区这个类的相关信息，其中的一个方法getName();接着执行这个方法打印数据</p>
+</blockquote>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2017/03/14/深入了解Java之类加载和案例分析/">深入了解Java之类加载和案例分析</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">feifei</a></p>
+        <p><span>发布时间:</span>2017-03-14, 14:37:23</p>
+        <p><span>最后更新:</span>2017-03-14, 15:08:40</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/03/14/深入了解Java之类加载和案例分析/" title="深入了解Java之类加载和案例分析">http://yoursite.com/2017/03/14/深入了解Java之类加载和案例分析/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2017/03/14/深入了解Java之类加载和案例分析/　　作者: feifei" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2017/03/13/深入了解Java之虚拟机内存/">
+                    深入了解Java之虚拟机内存
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："><span class="toc-number">1.</span> <span class="toc-text">在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。上篇文章已经分析了-Runtime-Data-Area（运行时数据）-这一块，那我们今天就来分析一下Java程序执行过程的-类加载器（Class-Loader）-这一块"><span class="toc-number">2.</span> <span class="toc-text">Java 程序的执行过程：Java 源代码文件（.Java文件）-> Java Compiler（Java编译器）->Java 字节码文件（.class文件）->类加载器（Class Loader）->Runtime Data Area（运行时数据）-> Execution Engine（执行引擎）。上篇文章已经分析了 Runtime Data Area（运行时数据） 这一块，那我们今天就来分析一下Java程序执行过程的  类加载器（Class Loader）  这一块</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一、类加载器（ClassLoader）"><span class="toc-number"></span> <span class="toc-text">一、类加载器（ClassLoader）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。"><span class="toc-number">0.1.</span> <span class="toc-text">把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#学习这个有什么好处呢？"><span class="toc-number"></span> <span class="toc-text">学习这个有什么好处呢？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类加载器（ClassLoader）的一些方法："><span class="toc-number"></span> <span class="toc-text">类加载器（ClassLoader）的一些方法：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、类加载的分类"><span class="toc-number"></span> <span class="toc-text">二、类加载的分类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、类加载过程"><span class="toc-number"></span> <span class="toc-text">三、类加载过程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#寻找jre目录，寻找jvm-dll，并初始化JVM，JVM启动后，运行Bootstrap-Loader，该Bootstrap-Loader-启动类加载器-自动加载Extended-Loader（扩展类加载器）和AppClass-Loader（系统类加载器），最后AppClass-Loader加载CLASSPATH目录下定义的Class。"><span class="toc-number">0.1.</span> <span class="toc-text">寻找jre目录，寻找jvm.dll，并初始化JVM，JVM启动后，运行Bootstrap Loader，该Bootstrap Loader(启动类加载器)自动加载Extended Loader（扩展类加载器）和AppClass Loader（系统类加载器），最后AppClass Loader加载CLASSPATH目录下定义的Class。</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、双亲委派模型"><span class="toc-number"></span> <span class="toc-text">四、双亲委派模型</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上，因此，所有的类加载请求最终都应该被传递到顶层的启动类加载器中，只有当父加载器在它的搜索范围中没有找到所需的类时，即无法完成该加载，子加载器才会尝试自己去加载该类。"><span class="toc-number">0.1.</span> <span class="toc-text">如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上，因此，所有的类加载请求最终都应该被传递到顶层的启动类加载器中，只有当父加载器在它的搜索范围中没有找到所需的类时，即无法完成该加载，子加载器才会尝试自己去加载该类。</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#代码实现"><span class="toc-number">1.</span> <span class="toc-text">代码实现:</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#“双亲委派模型”有什么作用呢？"><span class="toc-number"></span> <span class="toc-text">“双亲委派模型”有什么作用呢？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#五、类加载的三种方式"><span class="toc-number"></span> <span class="toc-text">五、类加载的三种方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#六、案例分析"><span class="toc-number"></span> <span class="toc-text">六、案例分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#基于上篇文章的”深入了解Java之虚拟机内存”和这篇”深入了解Java之类加载”的理论知识，我们用这个例子简单的来了解一下类的加载和内存分配的一些逻辑："><span class="toc-number">1.</span> <span class="toc-text">基于上篇文章的”深入了解Java之虚拟机内存”和这篇”深入了解Java之类加载”的理论知识，我们用这个例子简单的来了解一下类的加载和内存分配的一些逻辑：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#过程分析"><span class="toc-number"></span> <span class="toc-text">过程分析</span></a>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"深入了解Java之类加载和案例分析　| feifei　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+        <section class="youyan" id="comments">
+    <script>
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = 'http://v2.uyan.cc/code/uyan.js?uid=2127193';
+            (d.head || d.body).appendChild(s);
+        }
+    </script>
+    
+    <script> loadComment(); </script>
+
+    <div id="uyan_frame"></div>
+</section>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2017/03/13/深入了解Java之虚拟机内存/" title="下一篇: 深入了解Java之虚拟机内存">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/03/14/深入了解Java之类加载和案例分析/">深入了解Java之类加载和案例分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/13/深入了解Java之虚拟机内存/">深入了解Java之虚拟机内存</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/12/Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7/">Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/10/Android开发规范/">Android开发规范</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/09/基于Glide的图片下载工具类，简单、高效/">基于Glide的图片下载工具类，简单、高效</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2017 feifei
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

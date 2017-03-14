@@ -203,6 +203,67 @@
 </nav>
       <div class="body-wrap">
   
+    <article id="post-深入了解Java之类加载和案例分析" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/03/14/深入了解Java之类加载和案例分析/" class="article-date">
+      <time datetime="2017-03-14T06:37:23.226Z" itemprop="datePublished">2017-03-14</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/03/14/深入了解Java之类加载和案例分析/">深入了解Java之类加载和案例分析</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <h4 id="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："><a href="#在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：" class="headerlink" title="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："></a>在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：</h4><p><div align=center><br><img src="http://i1.piimg.com/567571/0282ddefcac2c362.png" alt="Java程序执行过程"><br></div></p>
+<h4 id="Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。上篇文章已经分析了-Runtime-Data-Area（运行时数据）-这一块，那我们今天就来分析一下Java程序执行过程的-类加载器（Class-Loader）-这一块"><a href="#Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。上篇文章已经分析了-Runtime-Data-Area（运行时数据）-这一块，那我们今天就来分析一下Java程序执行过程的-类加载器（Class-Loader）-这一块" class="headerlink" title="Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。上篇文章已经分析了 Runtime Data Area（运行时数据） 这一块，那我们今天就来分析一下Java程序执行过程的  类加载器（Class Loader）  这一块"></a>Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。上篇文章已经分析了 <strong>Runtime Data Area（运行时数据）</strong> 这一块，那我们今天就来分析一下Java程序执行过程的  <strong>类加载器（Class Loader）</strong>  这一块</h4><h2 id="一、类加载器（ClassLoader）"><a href="#一、类加载器（ClassLoader）" class="headerlink" title="一、类加载器（ClassLoader）"></a>一、类加载器（ClassLoader）</h2><h5 id="把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。"><a href="#把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。" class="headerlink" title="把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。"></a>把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。</h5><h3 id="学习这个有什么好处呢？"><a href="#学习这个有什么好处呢？" class="headerlink" title="学习这个有什么好处呢？"></a>学习这个有什么好处呢？</h3>
+          
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+
+      
+      
+        <p class="article-more-link">
+          <a href="/2017/03/14/深入了解Java之类加载和案例分析/#more">阅读全文 >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+
+  
     <article id="post-深入了解Java之虚拟机内存" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
