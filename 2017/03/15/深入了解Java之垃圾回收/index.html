@@ -14,16 +14,31 @@
 <meta name="author" content="feifei" />
 
 
-    
-    
 
-
-<meta property="og:type" content="website">
-<meta property="og:title" content="feifei">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="讲解之前先插一句，对于Java的一些变量的存储简单了解一下：
+1、本地变量（局部变量）：在方法体, 构造体内部定义的变量，在方法结束的时候就被摧毁（虚拟机栈的局部变量表）
+2、静态变量（类变量、全局变量；+ final 就是全局常量）：在类里但在方法外, 加了 static 关键字. （静态存储区/全局区、方法区）
+3、实例变量：在类里但是不在方法里 在类被载入的时候被实例化（堆，和对象创新时一起">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入了解Java之垃圾回收">
+<meta property="og:url" content="http://yoursite.com/2017/03/15/深入了解Java之垃圾回收/index.html">
 <meta property="og:site_name" content="feifei">
+<meta property="og:description" content="讲解之前先插一句，对于Java的一些变量的存储简单了解一下：
+1、本地变量（局部变量）：在方法体, 构造体内部定义的变量，在方法结束的时候就被摧毁（虚拟机栈的局部变量表）
+2、静态变量（类变量、全局变量；+ final 就是全局常量）：在类里但在方法外, 加了 static 关键字. （静态存储区/全局区、方法区）
+3、实例变量：在类里但是不在方法里 在类被载入的时候被实例化（堆，和对象创新时一起">
+<meta property="og:image" content="http://p1.bpimg.com/567571/319b993ce2b214f1.png">
+<meta property="og:image" content="http://i1.piimg.com/567571/38481578190c2d3f.png">
+<meta property="og:image" content="http://p1.bpimg.com/567571/eb9fa312adfbd910.png">
+<meta property="og:image" content="http://p1.bpimg.com/567571/f63498d13fe269a4.png">
+<meta property="og:updated_time" content="2017-03-15T09:18:09.846Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="feifei">
+<meta name="twitter:title" content="深入了解Java之垃圾回收">
+<meta name="twitter:description" content="讲解之前先插一句，对于Java的一些变量的存储简单了解一下：
+1、本地变量（局部变量）：在方法体, 构造体内部定义的变量，在方法结束的时候就被摧毁（虚拟机栈的局部变量表）
+2、静态变量（类变量、全局变量；+ final 就是全局常量）：在类里但在方法外, 加了 static 关键字. （静态存储区/全局区、方法区）
+3、实例变量：在类里但是不在方法里 在类被载入的时候被实例化（堆，和对象创新时一起">
+<meta name="twitter:image" content="http://p1.bpimg.com/567571/319b993ce2b214f1.png">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
@@ -51,13 +66,11 @@
 <link rel="stylesheet" href="/css/style.css">
 
 
-    <style> .article { opacity: 0;} </style>
-
 
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>feifei</title>
+<title>深入了解Java之垃圾回收 | feifei</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -66,8 +79,8 @@
     var yiliaConfig = {
         fancybox: true,
         animate: true,
-        isHome: true,
-        isPost: false,
+        isHome: false,
+        isPost: true,
         isArchive: false,
         isTag: false,
         isCategory: false,
@@ -201,9 +214,7 @@
     </div>
     <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
 </nav>
-      <div class="body-wrap">
-  
-    <article id="post-深入了解Java之垃圾回收" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-深入了解Java之垃圾回收" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
       <a href="/2017/03/15/深入了解Java之垃圾回收/" class="article-date">
@@ -221,12 +232,19 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/15/深入了解Java之垃圾回收/">深入了解Java之垃圾回收</a>
+    <h1 class="article-title" itemprop="name">
+      深入了解Java之垃圾回收
     </h1>
   
 
       </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
       
     
     <div class="article-entry" itemprop="articleBody">
@@ -257,333 +275,85 @@
       
     </div>
     
-    <div class="article-info article-info-index">
-      
-      
-
-      
-      
-      <div class="clearfix"></div>
-    </div>
-    
   </div>
   
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-深入了解Java之类加载和案例分析" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2017/03/14/深入了解Java之类加载和案例分析/" class="article-date">
-      <time datetime="2017-03-14T06:37:23.226Z" itemprop="datePublished">2017-03-14</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
     
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/14/深入了解Java之类加载和案例分析/">深入了解Java之类加载和案例分析</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <h4 id="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："><a href="#在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：" class="headerlink" title="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："></a>在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：</h4><p><div align=center><br><img src="http://i1.piimg.com/567571/0282ddefcac2c362.png" alt="Java程序执行过程"><br></div></p>
-<h4 id="Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。上篇文章已经分析了-Runtime-Data-Area（运行时数据）-这一块，那我们今天就来分析一下Java程序执行过程的-类加载器（Class-Loader）-这一块"><a href="#Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。上篇文章已经分析了-Runtime-Data-Area（运行时数据）-这一块，那我们今天就来分析一下Java程序执行过程的-类加载器（Class-Loader）-这一块" class="headerlink" title="Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。上篇文章已经分析了 Runtime Data Area（运行时数据） 这一块，那我们今天就来分析一下Java程序执行过程的  类加载器（Class Loader）  这一块"></a>Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。上篇文章已经分析了 <strong>Runtime Data Area（运行时数据）</strong> 这一块，那我们今天就来分析一下Java程序执行过程的  <strong>类加载器（Class Loader）</strong>  这一块</h4><h2 id="一、类加载器（ClassLoader）"><a href="#一、类加载器（ClassLoader）" class="headerlink" title="一、类加载器（ClassLoader）"></a>一、类加载器（ClassLoader）</h2><h5 id="把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。"><a href="#把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。" class="headerlink" title="把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。"></a>把Java类的数据从Class文件加载到虚拟机内存中，然后对这部分数据进行验证、准备、解析、初始化，最终形成可以被虚拟机直接使用的Java类型。</h5><h3 id="学习这个有什么好处呢？"><a href="#学习这个有什么好处呢？" class="headerlink" title="学习这个有什么好处呢？"></a>学习这个有什么好处呢？</h3>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-
-      
-      
-        <p class="article-more-link">
-          <a href="/2017/03/14/深入了解Java之类加载和案例分析/#more">阅读全文 >></a>
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2017/03/15/深入了解Java之垃圾回收/">深入了解Java之垃圾回收</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">feifei</a></p>
+        <p><span>发布时间:</span>2017-03-15, 16:11:58</p>
+        <p><span>最后更新:</span>2017-03-15, 17:18:09</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/03/15/深入了解Java之垃圾回收/" title="深入了解Java之垃圾回收">http://yoursite.com/2017/03/15/深入了解Java之垃圾回收/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2017/03/15/深入了解Java之垃圾回收/　　作者: feifei" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
         </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-深入了解Java之虚拟机内存" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2017/03/13/深入了解Java之虚拟机内存/" class="article-date">
-      <time datetime="2017-03-13T09:03:03.128Z" itemprop="datePublished">2017-03-13</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/13/深入了解Java之虚拟机内存/">深入了解Java之虚拟机内存</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <h4 id="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："><a href="#在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：" class="headerlink" title="在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程："></a>在讨论JVM内存区域分析之前，先来看一下Java程序具体执行的过程：</h4><p><div align=center><br><img src="http://i1.piimg.com/567571/0282ddefcac2c362.png" alt="Java程序执行过程"><br></div></p>
-<h4 id="Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。-我们今天就来分析一下Java程序执行过程的-Runtime-Data-Area（运行时数据）-这一块"><a href="#Java-程序的执行过程：Java-源代码文件（-Java文件）-gt-Java-Compiler（Java编译器）-gt-Java-字节码文件（-class文件）-gt-类加载器（Class-Loader）-gt-Runtime-Data-Area（运行时数据）-gt-Execution-Engine（执行引擎）。-我们今天就来分析一下Java程序执行过程的-Runtime-Data-Area（运行时数据）-这一块" class="headerlink" title="Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。 我们今天就来分析一下Java程序执行过程的  Runtime Data Area（运行时数据）  这一块"></a>Java 程序的执行过程：Java 源代码文件（.Java文件）-&gt; Java Compiler（Java编译器）-&gt;Java 字节码文件（.class文件）-&gt;类加载器（Class Loader）-&gt;Runtime Data Area（运行时数据）-&gt; Execution Engine（执行引擎）。 我们今天就来分析一下Java程序执行过程的  <strong>Runtime Data Area（运行时数据）</strong>  这一块</h4><h3 id="那么运行时数据区包括哪几部分呢？"><a href="#那么运行时数据区包括哪几部分呢？" class="headerlink" title="那么运行时数据区包括哪几部分呢？"></a>那么运行时数据区包括哪几部分呢？</h3>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-
-      
-      
-        <p class="article-more-link">
-          <a href="/2017/03/13/深入了解Java之虚拟机内存/#more">阅读全文 >></a>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
         </p>
-      
-      <div class="clearfix"></div>
     </div>
-    
-  </div>
-  
-</article>
 
 
 
-
-
-
-
-
-
-  
-    <article id="post-Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2017/03/12/Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7/" class="article-date">
-      <time datetime="2017-03-11T16:56:48.902Z" itemprop="datePublished">2017-03-12</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
+    <nav id="article-nav">
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/12/Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7/">Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <h2 id="什么是Maven呢？"><a href="#什么是Maven呢？" class="headerlink" title="什么是Maven呢？"></a>什么是Maven呢？</h2><blockquote>
-<p>Maven 是一个项目管理和自动构建工具</p>
-<h2 id="那我们为什么要搭建Maven的私有仓库呢？"><a href="#那我们为什么要搭建Maven的私有仓库呢？" class="headerlink" title="那我们为什么要搭建Maven的私有仓库呢？"></a>那我们为什么要搭建Maven的私有仓库呢？</h2><ul>
-<li><strong>有的公司不能访问外网，故通过搭建私有仓库来管理库文件、插件等；</strong></li>
-<li><strong>有的公司网速比较慢，故可以通过搭建私有仓库来获取库文件或者插件，速度比较快；</strong></li>
-<li><strong>有的公司经常会开发一些常用工具或者组件，故可以通过搭建私有仓库来共享给其他开发者，有利于统一维护和管理。</strong><h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-
-      
-      
-        <p class="article-more-link">
-          <a href="/2017/03/12/Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7/#more">阅读全文 >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-Android开发规范" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2017/03/10/Android开发规范/" class="article-date">
-      <time datetime="2017-03-10T03:31:27.341Z" itemprop="datePublished">2017-03-10</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/10/Android开发规范/">Android开发规范</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><ul>
-<li><a href="#1-前言">1 前言</a></li>
-<li><a href="#2-命名规范">2 命名规范</a></li>
-<li><a href="#3-资源文件规范">3 资源文件规范</a></li>
-<li><a href="#4-版本统一规范">4 版本统一规范</a></li>
-<li><a href="#5-第三方库规范">5 第三方库规范</a>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-
-      
-      
-        <p class="article-more-link">
-          <a href="/2017/03/10/Android开发规范/#more">阅读全文 >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-基于Glide的图片下载工具类，简单、高效" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2017/03/09/基于Glide的图片下载工具类，简单、高效/" class="article-date">
-      <time datetime="2017-03-09T07:58:35.926Z" itemprop="datePublished">2017-03-09</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2017/03/14/深入了解Java之类加载和案例分析/">
+                    深入了解Java之类加载和案例分析
+                </a>
+            </div>
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/09/基于Glide的图片下载工具类，简单、高效/">基于Glide的图片下载工具类，简单、高效</a>
-    </h1>
-  
+    </nav>
 
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <h1 id="DownImageUtil"><a href="#DownImageUtil" class="headerlink" title="DownImageUtil"></a>DownImageUtil</h1><p>基于Glide的图片下载工具类，简单、高效</p>
-<p>预览图：</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/1621094-67c930bad4bdc9c7.gif?imageMogr2/auto-orient/strip" alt="download.gif"></p>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-
-      
-      
-        <p class="article-more-link">
-          <a href="/2017/03/09/基于Glide的图片下载工具类，简单、高效/#more">阅读全文 >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
   
 </article>
 
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#讲解之前先插一句，对于Java的一些变量的存储简单了解一下："><span class="toc-number">1.</span> <span class="toc-text">讲解之前先插一句，对于Java的一些变量的存储简单了解一下：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#一、Java垃圾回收，它到底回收的是什么？"><span class="toc-number"></span> <span class="toc-text">一、Java垃圾回收，它到底回收的是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#上篇文章介绍了Java内存运行时数据区的各个部分，其中程序计数器、虚拟机栈、本地方法栈3个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的内存分配和回收都具备确定性，在这几个区域内就不需要过多考虑回收的问题，因为方法结束或者线程结束时，内存自然就跟随着回收了。而Java堆和方法区则不一样，一个接口中的多个实现类需要的内存可能不一样，一个方法中的多个分支需要的内存也可能不一样，我们只有在程序处于运行期间时才能知道会创建哪些对象，这部分内存的分配和回收都是动态的，所以Java的垃圾回收机制主要是在堆和方法区。"><span class="toc-number">0.1.</span> <span class="toc-text">上篇文章介绍了Java内存运行时数据区的各个部分，其中程序计数器、虚拟机栈、本地方法栈3个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的内存分配和回收都具备确定性，在这几个区域内就不需要过多考虑回收的问题，因为方法结束或者线程结束时，内存自然就跟随着回收了。而Java堆和方法区则不一样，一个接口中的多个实现类需要的内存可能不一样，一个方法中的多个分支需要的内存也可能不一样，我们只有在程序处于运行期间时才能知道会创建哪些对象，这部分内存的分配和回收都是动态的，所以Java的垃圾回收机制主要是在堆和方法区。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、有哪些算法去标志这个对象是可以回收的呢？"><span class="toc-number"></span> <span class="toc-text">二、有哪些算法去标志这个对象是可以回收的呢？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-引用计数算法"><span class="toc-number">1.</span> <span class="toc-text">1. 引用计数算法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#给对象中添加一个引用计数器，每当有一个地方引用它时，计数器值就加1；当引用失效时，计数器值就减1；任何时刻计数器为0的对象就是不可能再被使用的。应用：python、object-c"><span class="toc-number">1.1.</span> <span class="toc-text">给对象中添加一个引用计数器，每当有一个地方引用它时，计数器值就加1；当引用失效时，计数器值就减1；任何时刻计数器为0的对象就是不可能再被使用的。应用：python、object-c</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#缺点：它很难解决对象之间相互循环引用的问题"><span class="toc-number">2.</span> <span class="toc-text">缺点：它很难解决对象之间相互循环引用的问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-可达性分析算法"><span class="toc-number">3.</span> <span class="toc-text">2. 可达性分析算法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#这个算法的基本思路就是通过一系列的称为“GC-Roots”的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径称为引用链（Reference-Chain），当一个对象到GC-Roots没有任何引用链相连时，则证明此对象是不可用的。如图对象object-5、object-6、object-7虽然互相有关联，但是它们到GC-Roots是不可达的，所以它们将会被判定为是可回收的对象。应用：Java、C"><span class="toc-number">3.1.</span> <span class="toc-text">这个算法的基本思路就是通过一系列的称为“GC Roots”的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径称为引用链（Reference  Chain），当一个对象到GC  Roots没有任何引用链相连时，则证明此对象是不可用的。如图对象object 5、object 6、object 7虽然互相有关联，但是它们到GC Roots是不可达的，所以它们将会被判定为是可回收的对象。应用：Java、C</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#什么对象可以作为“GC-Roots”呢？"><span class="toc-number">4.</span> <span class="toc-text">什么对象可以作为“GC Roots”呢？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、有哪些算法去进行垃圾的回收呢？"><span class="toc-number"></span> <span class="toc-text">三、有哪些算法去进行垃圾的回收呢？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#上面是标志着这个对象是垃圾，接下去就是对这个垃圾进行回收。"><span class="toc-number">0.1.</span> <span class="toc-text">上面是标志着这个对象是垃圾，接下去就是对这个垃圾进行回收。</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-标记-清除算法"><span class="toc-number">1.</span> <span class="toc-text">1. 标记-清除算法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#标记-清除算法分为两个阶段：标记阶段和清除阶段。标记阶段的任务是标记出所有需要被回收的对象，清除阶段就是回收被标记的对象所占用的空间。"><span class="toc-number">1.1.</span> <span class="toc-text">标记-清除算法分为两个阶段：标记阶段和清除阶段。标记阶段的任务是标记出所有需要被回收的对象，清除阶段就是回收被标记的对象所占用的空间。</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#缺点：一个是效率问题，标记和清除两个过程的效率都不高；另一个是空间问题，标记清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致以后在程序运行过程中需要分配较大对象时，无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。"><span class="toc-number">2.</span> <span class="toc-text">缺点：一个是效率问题，标记和清除两个过程的效率都不高；另一个是空间问题，标记清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致以后在程序运行过程中需要分配较大对象时，无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-复制算法"><span class="toc-number">3.</span> <span class="toc-text">2. 复制算法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#它将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉。这样使得每次都是对整个半区进行内存回收，内存分配时也就不用考虑内存碎片等复杂情况，只要移动堆顶指针，按顺序分配内存即可，实现简单，运行高效。适用于存活对象少，回收对象多的情况下"><span class="toc-number">3.1.</span> <span class="toc-text">它将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉。这样使得每次都是对整个半区进行内存回收，内存分配时也就不用考虑内存碎片等复杂情况，只要移动堆顶指针，按顺序分配内存即可，实现简单，运行高效。适用于存活对象少，回收对象多的情况下</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#缺点：内存缩小为了原来的一半"><span class="toc-number">4.</span> <span class="toc-text">缺点：内存缩小为了原来的一半</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-标记-整理算法"><span class="toc-number">5.</span> <span class="toc-text">3. 标记-整理算法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#该算法标记阶段和复制算法一样，但是在完成标记之后，它不是直接清理可回收对象，而是将存活对象都向一端移动，然后清理掉端边界以外的内存。适用于存活对象多，回收对象少的情况下"><span class="toc-number">5.1.</span> <span class="toc-text">该算法标记阶段和复制算法一样，但是在完成标记之后，它不是直接清理可回收对象，而是将存活对象都向一端移动，然后清理掉端边界以外的内存。适用于存活对象多，回收对象少的情况下</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-分代收集算法"><span class="toc-number">6.</span> <span class="toc-text">4. 分代收集算法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Java的分代：老年代和新生代"><span class="toc-number">6.1.</span> <span class="toc-text">Java的分代：老年代和新生代</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#新生代又分为：一块较大的Eden空间和两块较小的Survivor空间，比例为8：1：1，"><span class="toc-number">6.2.</span> <span class="toc-text">新生代又分为：一块较大的Eden空间和两块较小的Survivor空间，比例为8：1：1，</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#为什么新生代要划分为这样的一个空间呢？"><span class="toc-number">7.</span> <span class="toc-text">为什么新生代要划分为这样的一个空间呢？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#新生代采用的是复制算法，新的对象产生时就会先存放在Eden空间里，当遇到第一次GC时，会把Eden里面存活的对象复制到Survivor-A，然后清除Eden和Survivor-B的对象；第二次GC时，会把Eden和Survivor-A里面存活的对象复制到Survivor-B中；最后经过几次的GC之后就会把存活的对象转移到老年代。就这样需要三块区域进行复制转移。至于比例为什么是8：1：1，因为Eden区域比较频繁的产生对象而Survivor存放的对象较少。"><span class="toc-number">7.1.</span> <span class="toc-text">新生代采用的是复制算法，新的对象产生时就会先存放在Eden空间里，当遇到第一次GC时，会把Eden里面存活的对象复制到Survivor A，然后清除Eden和Survivor B的对象；第二次GC时，会把Eden和Survivor A里面存活的对象复制到Survivor B中；最后经过几次的GC之后就会把存活的对象转移到老年代。就这样需要三块区域进行复制转移。至于比例为什么是8：1：1，因为Eden区域比较频繁的产生对象而Survivor存放的对象较少。</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#什么对象会被转移到老年代呢？"><span class="toc-number">8.</span> <span class="toc-text">什么对象会被转移到老年代呢？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#在新生代中，每次垃圾收集时都发现有大批对象死去，只有少量存活，那就选用复制算法，只需要付出少量存活对象的复制成本就可以完成收集。而老年代中因为对象存活率高、没有额外空间对它进行分配担保，就必须使用“标记—整理”算法来进行回收。"><span class="toc-number">8.1.</span> <span class="toc-text">在新生代中，每次垃圾收集时都发现有大批对象死去，只有少量存活，那就选用复制算法，只需要付出少量存活对象的复制成本就可以完成收集。而老年代中因为对象存活率高、没有额外空间对它进行分配担保，就必须使用“标记—整理”算法来进行回收。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#四、小结"><span class="toc-number"></span> <span class="toc-text">四、小结</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#垃圾回收可以有效的防止内存泄露，更好的使用内存。"><span class="toc-number">0.1.</span> <span class="toc-text">垃圾回收可以有效的防止内存泄露，更好的使用内存。</span></a></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"深入了解Java之垃圾回收　| feifei　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
 
 
 
@@ -591,9 +361,47 @@
 
 
 
+    
+        <section class="youyan" id="comments">
+    <script>
+        var loadComment = function(){
+            var d = document, s = d.createElement('script');
+            s.src = 'http://v2.uyan.cc/code/uyan.js?uid=2127193';
+            (d.head || d.body).appendChild(s);
+        }
+    </script>
+    
+    <script> loadComment(); </script>
 
-  
-  
+    <div id="uyan_frame"></div>
+</section>
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2017/03/14/深入了解Java之类加载和案例分析/" title="下一篇: 深入了解Java之类加载和案例分析">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/03/15/深入了解Java之垃圾回收/">深入了解Java之垃圾回收</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/14/深入了解Java之类加载和案例分析/">深入了解Java之类加载和案例分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/13/深入了解Java之虚拟机内存/">深入了解Java之虚拟机内存</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/12/Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7/">Android Studio 上传库文件到(Maven)私有仓库--基于Windows 7</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/10/Android开发规范/">Android开发规范</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/03/09/基于Glide的图片下载工具类，简单、高效/">基于Glide的图片下载工具类，简单、高效</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
 </div>
       <footer id="footer">
     <div class="outer">
@@ -647,10 +455,6 @@
         })
     </script>
 
-
-    
-
-     
 
 
 
