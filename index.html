@@ -232,109 +232,9 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <h4 id="在了解存储路径之前，先来看看Android-QQ的文件管理界面，了解一下QQ的数据文件路径来源，到底是什么地方？"><a href="#在了解存储路径之前，先来看看Android-QQ的文件管理界面，了解一下QQ的数据文件路径来源，到底是什么地方？" class="headerlink" title="在了解存储路径之前，先来看看Android QQ的文件管理界面，了解一下QQ的数据文件路径来源，到底是什么地方？"></a>在了解存储路径之前，先来看看Android QQ的文件管理界面，了解一下QQ的数据文件路径来源，到底是什么地方？</h4><p><img src="http://p1.bqimg.com/567571/1383abc5451a1ea8.png" alt="QQ 文件截图"></p>
-<h3 id="手Q文件管理对应存储目录"><a href="#手Q文件管理对应存储目录" class="headerlink" title="手Q文件管理对应存储目录"></a>手Q文件管理对应存储目录</h3><blockquote>
-<ul>
-<li><p>我的文件：是指放在QQ指定目录下的文件：<code>/tencent/QQfile_recv/</code>（顺便说一下微信的存储目录：<code>/tencent/MicroMsg/Download/</code>）</p>
-</li>
-<li><p>手机内存：其实是内部存储的根目录，在ES文件浏览器对应的是根目录，路径为：<code>Environment.getDataDirectory().getParentFile()</code></p>
-</li>
-<li><p>SD卡：这里的SD卡是指内置的SD卡，路径为：<code>Environment.getExternalStorageDirectory()</code></p>
-</li>
-<li><p>扩展卡内存：外置SD卡</p>
-</li>
-</ul>
-</blockquote>
-<h2 id="手机存储"><a href="#手机存储" class="headerlink" title="手机存储"></a>手机存储</h2><h5 id="手机分为内部存储和外部存储"><a href="#手机分为内部存储和外部存储" class="headerlink" title="手机分为内部存储和外部存储"></a>手机分为内部存储和外部存储</h5><h3 id="1、内部存储"><a href="#1、内部存储" class="headerlink" title="1、内部存储"></a>1、内部存储</h3><table>
-<thead>
-<tr>
-<th>主要方法</th>
-<th style="text-align:right">路径</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Environment.getDataDirectory()</td>
-<td style="text-align:right">/data</td>
-</tr>
-<tr>
-<td>Environment.getDownloadCacheDirectory()</td>
-<td style="text-align:right">/cache</td>
-</tr>
-<tr>
-<td>Environment.getRootDirectory()</td>
-<td style="text-align:right">/system</td>
-</tr>
-</tbody>
-</table>
-<h5 id="这里的内部存储对应的就是手机QQ的手机内存，路径为Environment-getDataDirectory-getParentFile-就是根目录，这个目录下还有一些私密的数据，比如：databases（数据库）、shared-prefs（SharedPreferences）等"><a href="#这里的内部存储对应的就是手机QQ的手机内存，路径为Environment-getDataDirectory-getParentFile-就是根目录，这个目录下还有一些私密的数据，比如：databases（数据库）、shared-prefs（SharedPreferences）等" class="headerlink" title="这里的内部存储对应的就是手机QQ的手机内存，路径为Environment.getDataDirectory().getParentFile()就是根目录，这个目录下还有一些私密的数据，比如：databases（数据库）、shared_prefs（SharedPreferences）等"></a>这里的内部存储对应的就是手机QQ的手机内存，路径为<code>Environment.getDataDirectory().getParentFile()</code>就是根目录，这个目录下还有一些私密的数据，比如：databases（数据库）、shared_prefs（SharedPreferences）等</h5><h4 id="注意：没有root的手机不能打开该文件夹的"><a href="#注意：没有root的手机不能打开该文件夹的" class="headerlink" title="注意：没有root的手机不能打开该文件夹的"></a>注意：没有root的手机不能打开该文件夹的</h4><h3 id="2、外部存储"><a href="#2、外部存储" class="headerlink" title="2、外部存储"></a>2、外部存储</h3><h5 id="外部存储又分为SD卡和扩展卡内存"><a href="#外部存储又分为SD卡和扩展卡内存" class="headerlink" title="外部存储又分为SD卡和扩展卡内存"></a>外部存储又分为SD卡和扩展卡内存</h5><h4 id="（1）SD卡"><a href="#（1）SD卡" class="headerlink" title="（1）SD卡"></a>（1）SD卡</h4><h5 id="获取路径方式是Environment-getExternalStorageDirectory-storage-sdcard0"><a href="#获取路径方式是Environment-getExternalStorageDirectory-storage-sdcard0" class="headerlink" title="获取路径方式是Environment.getExternalStorageDirectory() /storage/sdcard0"></a>获取路径方式是<code>Environment.getExternalStorageDirectory()</code> <code>/storage/sdcard0</code></h5><table>
-<thead>
-<tr>
-<th>方法</th>
-<th style="text-align:right">路径</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Environment.getExternalStoragePublicDirectory(DIRECTORY_ALARMS)</td>
-<td style="text-align:right">/storage/sdcard0/Alarms</td>
-</tr>
-<tr>
-<td>Environment.getExternalStoragePublicDirectory(DIRECTORY_DCIM)</td>
-<td style="text-align:right">/storage/sdcard0/DCIM</td>
-</tr>
-<tr>
-<td>Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)</td>
-<td style="text-align:right">/storage/sdcard0/Download</td>
-</tr>
-<tr>
-<td>Environment.getExternalStoragePublicDirectory(DIRECTORY_MOVIES)</td>
-<td style="text-align:right">/storage/sdcard0/Movies</td>
-</tr>
-<tr>
-<td>Environment.getExternalStoragePublicDirectory(DIRECTORY_MUSIC)</td>
-<td style="text-align:right">/storage/sdcard0/Music</td>
-</tr>
-<tr>
-<td>Environment.getExternalStoragePublicDirectory(DIRECTORY_NOTIFICATIONS)</td>
-<td style="text-align:right">/storage/sdcard0/Notifications</td>
-</tr>
-<tr>
-<td>Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES)</td>
-<td style="text-align:right">/storage/sdcard0/Pictures</td>
-</tr>
-<tr>
-<td>Environment.getExternalStoragePublicDirectory(DIRECTORY_PODCASTS)</td>
-<td style="text-align:right">/storage/sdcard0/Podcasts</td>
-</tr>
-<tr>
-<td>Environment.getExternalStoragePublicDirectory(DIRECTORY_RINGTONES)</td>
-<td style="text-align:right">/storage/sdcard0/Ringtones</td>
-</tr>
-</tbody>
-</table>
-<h5 id="上面的九个方法对应的就是SD卡的九大共有目录，Google官方建议我们数据应该存储在私有目录下，不建议存储在共有目录下或其他地方"><a href="#上面的九个方法对应的就是SD卡的九大共有目录，Google官方建议我们数据应该存储在私有目录下，不建议存储在共有目录下或其他地方" class="headerlink" title="上面的九个方法对应的就是SD卡的九大共有目录，Google官方建议我们数据应该存储在私有目录下，不建议存储在共有目录下或其他地方"></a>上面的九个方法对应的就是SD卡的九大共有目录，Google官方建议我们数据应该存储在私有目录下，不建议存储在共有目录下或其他地方</h5><h4 id="那什么是私有目录呢？"><a href="#那什么是私有目录呢？" class="headerlink" title="那什么是私有目录呢？"></a>那什么是私有目录呢？</h4><h5 id="就是在外部存储的App的包名下，如：-storage-emulated-0-Android-data-cwj-test-包名-files-test"><a href="#就是在外部存储的App的包名下，如：-storage-emulated-0-Android-data-cwj-test-包名-files-test" class="headerlink" title="就是在外部存储的App的包名下，如：/storage/emulated/0/Android/data/cwj.test(包名)/files/test"></a>就是在外部存储的App的包名下，如：<code>/storage/emulated/0/Android/data/cwj.test(包名)/files/test</code></h5><table>
-<thead>
-<tr>
-<th>方法</th>
-<th style="text-align:right">路径</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>getExternalFilesDir()</td>
-<td style="text-align:right">/storage/emulated/0/Android/data/cwj.test(包名)/files/test</td>
-</tr>
-<tr>
-<td>getExternalCacheDir</td>
-<td style="text-align:right">/storage/emulated/0/Android/data/cwj.test(包名)/cache/test</td>
-</tr>
-</tbody>
-</table>
-<h5 id="一般情况下有包名的路径我们都是调用Context中的方法来获得，没有包名的路径，我们直接调用Environment中的方法获得。"><a href="#一般情况下有包名的路径我们都是调用Context中的方法来获得，没有包名的路径，我们直接调用Environment中的方法获得。" class="headerlink" title="一般情况下有包名的路径我们都是调用Context中的方法来获得，没有包名的路径，我们直接调用Environment中的方法获得。"></a>一般情况下有包名的路径我们都是调用Context中的方法来获得，没有包名的路径，我们直接调用Environment中的方法获得。</h5><h4 id="（2）扩展卡内存"><a href="#（2）扩展卡内存" class="headerlink" title="（2）扩展卡内存"></a>（2）扩展卡内存</h4><h5 id="扩展内存就是我们插入的外置SD卡获取扩展内存的路径有点难度，不过Google很牛逼，哈哈"><a href="#扩展内存就是我们插入的外置SD卡获取扩展内存的路径有点难度，不过Google很牛逼，哈哈" class="headerlink" title="扩展内存就是我们插入的外置SD卡获取扩展内存的路径有点难度，不过Google很牛逼，哈哈"></a>扩展内存就是我们插入的外置SD卡获取扩展内存的路径有点难度，不过Google很牛逼，哈哈</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">private static String getExtendedMemoryPath(Context mContext) &#123;  </div><div class="line"></div><div class="line">      StorageManager mStorageManager = (StorageManager) mContext.getSystemService(Context.STORAGE_SERVICE);</div><div class="line">        Class&lt;?&gt; storageVolumeClazz = null;</div><div class="line">        try &#123;</div><div class="line">            storageVolumeClazz = Class.forName(&quot;android.os.storage.StorageVolume&quot;);</div><div class="line">            Method getVolumeList = mStorageManager.getClass().getMethod(&quot;getVolumeList&quot;);</div><div class="line">            Method getPath = storageVolumeClazz.getMethod(&quot;getPath&quot;);</div><div class="line">            Method isRemovable = storageVolumeClazz.getMethod(&quot;isRemovable&quot;);</div><div class="line">            Object result = getVolumeList.invoke(mStorageManager);</div><div class="line">            final int length = Array.getLength(result);</div><div class="line">            for (int i = 0; i &lt; length; i++) &#123;</div><div class="line">                Object storageVolumeElement = Array.get(result, i);</div><div class="line">                String path = (String) getPath.invoke(storageVolumeElement);</div><div class="line">                boolean removable = (Boolean) isRemovable.invoke(storageVolumeElement);</div><div class="line">                if (removable) &#123;</div><div class="line">                    return path;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125; catch (ClassNotFoundException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125; catch (InvocationTargetException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125; catch (NoSuchMethodException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125; catch (IllegalAccessException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        return null;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="该方法主要是通过反射的方式使用在sdk中被-隐藏-的类-StroageVolume-中的方法getVolumeList-，获取外部存储的路径。"><a href="#该方法主要是通过反射的方式使用在sdk中被-隐藏-的类-StroageVolume-中的方法getVolumeList-，获取外部存储的路径。" class="headerlink" title="该方法主要是通过反射的方式使用在sdk中被 隐藏 的类 StroageVolume 中的方法getVolumeList()，获取外部存储的路径。"></a>该方法主要是通过反射的方式使用在sdk中被 隐藏 的类 StroageVolume 中的方法getVolumeList()，获取外部存储的路径。</h5><h3 id="路径测试："><a href="#路径测试：" class="headerlink" title="路径测试："></a>路径测试：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Log.e(&quot;cwj&quot;, &quot;外置SD卡路径 = &quot; + getStoragePath(this));</div><div class="line">Log.e(&quot;cwj&quot;, &quot;内置SD卡路径 = &quot; + Environment.getExternalStorageDirectory().getAbsolutePath());</div><div class="line">Log.e(&quot;cwj&quot;, &quot;手机内存根目录路径  = &quot; + Environment.getDataDirectory().getParentFile().getAbsolutePath());</div></pre></td></tr></table></figure>
-<p><img src="http://p1.bpimg.com/567571/7300e2e4066afa62.png" alt="测试截图"></p>
-
+              <h4 id="在了解存储路径之前，先来看看Android-QQ的文件管理界面，了解一下QQ的数据文件路径来源，到底是来源于什么地方？"><a href="#在了解存储路径之前，先来看看Android-QQ的文件管理界面，了解一下QQ的数据文件路径来源，到底是来源于什么地方？" class="headerlink" title="在了解存储路径之前，先来看看Android QQ的文件管理界面，了解一下QQ的数据文件路径来源，到底是来源于什么地方？"></a>在了解存储路径之前，先来看看Android QQ的文件管理界面，了解一下QQ的数据文件路径来源，到底是来源于什么地方？</h4><p><img src="http://p1.bqimg.com/567571/1383abc5451a1ea8.png" alt="QQ 文件截图"></p>
+<h3 id="手Q文件管理对应存储目录"><a href="#手Q文件管理对应存储目录" class="headerlink" title="手Q文件管理对应存储目录"></a>手Q文件管理对应存储目录</h3>
+          
       
     </div>
     
@@ -343,6 +243,10 @@
       
 
       
+      
+        <p class="article-more-link">
+          <a href="/2017/03/17/Android存储路径你了解多少/#more">阅读全文 >></a>
+        </p>
       
       <div class="clearfix"></div>
     </div>
