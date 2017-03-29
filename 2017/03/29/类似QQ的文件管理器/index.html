@@ -15,21 +15,51 @@
 
 
 
-<meta name="description" content="DownImageUtil基于Glide的图片下载工具类，简单、高效
-预览图：">
+<meta name="description" content="介绍
+基于上篇文章的”Android存储路径你了解多少”的一个实例例子
+
+github地址 喜欢的记得Star哦！谢谢大家了！一些技能
+
+BaseActivity、BaseFragment的一个分装，fragment基于懒加载
+fragment嵌套ViewPage+fragment的实现
+用rxjava进行文件的耗时查询
+greenDao数据库的使用，在项目中用于保存选择的文件信息
+基于permi">
 <meta property="og:type" content="article">
-<meta property="og:title" content="基于Glide的图片下载工具类，简单、高效">
-<meta property="og:url" content="http://yoursite.com/2017/03/09/基于Glide的图片下载工具类，简单、高效/index.html">
+<meta property="og:title" content="类似QQ的文件管理器">
+<meta property="og:url" content="http://yoursite.com/2017/03/29/类似QQ的文件管理器/index.html">
 <meta property="og:site_name" content="feifei">
-<meta property="og:description" content="DownImageUtil基于Glide的图片下载工具类，简单、高效
-预览图：">
-<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1621094-67c930bad4bdc9c7.gif?imageMogr2/auto-orient/strip">
-<meta property="og:updated_time" content="2017-03-13T09:04:42.779Z">
+<meta property="og:description" content="介绍
+基于上篇文章的”Android存储路径你了解多少”的一个实例例子
+
+github地址 喜欢的记得Star哦！谢谢大家了！一些技能
+
+BaseActivity、BaseFragment的一个分装，fragment基于懒加载
+fragment嵌套ViewPage+fragment的实现
+用rxjava进行文件的耗时查询
+greenDao数据库的使用，在项目中用于保存选择的文件信息
+基于permi">
+<meta property="og:image" content="http://i1.piimg.com/567571/24df7624eae8f2e0.png">
+<meta property="og:image" content="http://i2.muimg.com/567571/e43fb082b16eeb3f.png">
+<meta property="og:image" content="http://i4.buimg.com/567571/9ff11ae42095afc8.png">
+<meta property="og:image" content="http://i1.piimg.com/567571/3cecf08c2f931c46.png">
+<meta property="og:image" content="http://i1.piimg.com/567571/216eb442a8d399b0.png">
+<meta property="og:image" content="http://i4.buimg.com/567571/91936f806919f28d.png">
+<meta property="og:image" content="http://i1.piimg.com/567571/48cd6667787b9525.png">
+<meta property="og:updated_time" content="2017-03-29T03:52:43.830Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="基于Glide的图片下载工具类，简单、高效">
-<meta name="twitter:description" content="DownImageUtil基于Glide的图片下载工具类，简单、高效
-预览图：">
-<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1621094-67c930bad4bdc9c7.gif?imageMogr2/auto-orient/strip">
+<meta name="twitter:title" content="类似QQ的文件管理器">
+<meta name="twitter:description" content="介绍
+基于上篇文章的”Android存储路径你了解多少”的一个实例例子
+
+github地址 喜欢的记得Star哦！谢谢大家了！一些技能
+
+BaseActivity、BaseFragment的一个分装，fragment基于懒加载
+fragment嵌套ViewPage+fragment的实现
+用rxjava进行文件的耗时查询
+greenDao数据库的使用，在项目中用于保存选择的文件信息
+基于permi">
+<meta name="twitter:image" content="http://i1.piimg.com/567571/24df7624eae8f2e0.png">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
@@ -61,7 +91,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>基于Glide的图片下载工具类，简单、高效 | feifei</title>
+<title>类似QQ的文件管理器 | feifei</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -205,11 +235,11 @@
     </div>
     <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
 </nav>
-      <div class="body-wrap"><article id="post-基于Glide的图片下载工具类，简单、高效" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-类似QQ的文件管理器" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2017/03/09/基于Glide的图片下载工具类，简单、高效/" class="article-date">
-      <time datetime="2017-03-09T07:58:35.926Z" itemprop="datePublished">2017-03-09</time>
+      <a href="/2017/03/29/类似QQ的文件管理器/" class="article-date">
+      <time datetime="2017-03-29T02:15:00.633Z" itemprop="datePublished">2017-03-29</time>
 </a>
 
 
@@ -224,7 +254,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      基于Glide的图片下载工具类，简单、高效
+      类似QQ的文件管理器
     </h1>
   
 
@@ -241,14 +271,22 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <h1 id="DownImageUtil"><a href="#DownImageUtil" class="headerlink" title="DownImageUtil"></a>DownImageUtil</h1><p>基于Glide的图片下载工具类，简单、高效</p>
-<p>预览图：</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/1621094-67c930bad4bdc9c7.gif?imageMogr2/auto-orient/strip" alt="download.gif"></p>
-<a id="more"></a>
-<h2 id="三步帮你实现"><a href="#三步帮你实现" class="headerlink" title="三步帮你实现"></a>三步帮你实现</h2><p>第一句 , 实例化:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mDownImageUtil = new DownImageUtil(MainActivity.this);</div></pre></td></tr></table></figure></p>
-<p>第二句 , 下载图片:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">//第一个参数为下载地址，第二个参数为图片名，第三个参数为目录名</div><div class="line"> //  地址为格式：/storage/emulated/0/cwj/img/Test/1.png</div><div class="line">mDownImageUtil.onDownLoad(&quot;url&quot;,1,&quot;Test&quot;);;</div></pre></td></tr></table></figure></p>
-<p>第三句 , 设置回调，显示图片:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">mDownImageUtil.setImageCallBack(new ImageCallBack() &#123;</div><div class="line">         @Override</div><div class="line">         public void onSuccess(String url) &#123;</div><div class="line">             Glide.with(MainActivity.this).load(url).into(iv_down);</div><div class="line">             tv_path.setText(&quot;文件存储地址为：\n&quot; + url);</div><div class="line">         &#125;</div><div class="line"></div><div class="line">         @Override</div><div class="line">         public void onFailed() &#123;</div><div class="line"></div><div class="line">         &#125;</div><div class="line">     &#125;);</div></pre></td></tr></table></figure></p>
-<p>是不是很简单呀？细节可看看源码<br>GitHub下载地址：<a href="https://github.com/cwjfeifei/DownLoadImage" target="_blank" rel="external">DownLoadImage</a></p>
+        <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><blockquote>
+<p>基于上篇文章的”Android存储路径你了解多少”的一个实例例子</p>
+</blockquote>
+<h3 id="github地址-喜欢的记得Star哦！谢谢大家了！"><a href="#github地址-喜欢的记得Star哦！谢谢大家了！" class="headerlink" title="github地址 喜欢的记得Star哦！谢谢大家了！"></a><a href="https://github.com/cwjfeifei/AndroidFileManage" target="_blank" rel="external">github地址</a> 喜欢的记得Star哦！谢谢大家了！</h3><h3 id="一些技能"><a href="#一些技能" class="headerlink" title="一些技能"></a>一些技能</h3><blockquote>
+<ul>
+<li>BaseActivity、BaseFragment的一个分装，fragment基于懒加载</li>
+<li>fragment嵌套ViewPage+fragment的实现</li>
+<li>用rxjava进行文件的耗时查询</li>
+<li>greenDao数据库的使用，在项目中用于保存选择的文件信息</li>
+<li>基于permissionsdispatcher的6.0权限管理</li>
+<li>基于PhotoView的fragment+ViewPage的图片预览</li>
+<li>还有glide、butterknife、BaseRecyclerViewAdapterHelper等的使用<a id="more"></a>
+<h3 id="直接上效果图"><a href="#直接上效果图" class="headerlink" title="直接上效果图"></a>直接上效果图</h3></li>
+</ul>
+</blockquote>
+<p> <img src="http://i1.piimg.com/567571/24df7624eae8f2e0.png" width="300" height="500" alt="图片名称" align="center"><br>  <img src="http://i2.muimg.com/567571/e43fb082b16eeb3f.png" width="300" height="500" alt="图片名称" align="center"><br>   <img src="http://i4.buimg.com/567571/9ff11ae42095afc8.png" width="300" height="500" alt="图片名称" align="center"><br>    <img src="http://i1.piimg.com/567571/3cecf08c2f931c46.png" width="300" height="500" alt="图片名称" align="center"><br>     <img src="http://i1.piimg.com/567571/216eb442a8d399b0.png" width="300" height="500" alt="图片名称" align="center"><br>          <img src="http://i4.buimg.com/567571/91936f806919f28d.png" width="300" height="500" alt="图片名称" align="center"><br>    <img src="http://i1.piimg.com/567571/48cd6667787b9525.png" width="300" height="500" alt="图片名称" align="center"></p>
 
       
     </div>
@@ -257,13 +295,13 @@
   
     
     <div class="copyright">
-        <p><span>本文标题:</span><a href="/2017/03/09/基于Glide的图片下载工具类，简单、高效/">基于Glide的图片下载工具类，简单、高效</a></p>
+        <p><span>本文标题:</span><a href="/2017/03/29/类似QQ的文件管理器/">类似QQ的文件管理器</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">feifei</a></p>
-        <p><span>发布时间:</span>2017-03-09, 15:58:35</p>
-        <p><span>最后更新:</span>2017-03-13, 17:04:42</p>
+        <p><span>发布时间:</span>2017-03-29, 10:15:00</p>
+        <p><span>最后更新:</span>2017-03-29, 11:52:43</p>
         <p>
-            <span>原始链接:</span><a class="post-url" href="/2017/03/09/基于Glide的图片下载工具类，简单、高效/" title="基于Glide的图片下载工具类，简单、高效">http://yoursite.com/2017/03/09/基于Glide的图片下载工具类，简单、高效/</a>
-            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2017/03/09/基于Glide的图片下载工具类，简单、高效/　　作者: feifei" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <span>原始链接:</span><a class="post-url" href="/2017/03/29/类似QQ的文件管理器/" title="类似QQ的文件管理器">http://yoursite.com/2017/03/29/类似QQ的文件管理器/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2017/03/29/类似QQ的文件管理器/　　作者: feifei" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
             <script> var clipboard = new Clipboard('.copy-path'); </script>
         </p>
         <p>
@@ -275,12 +313,12 @@
 
     <nav id="article-nav">
         
-            <div id="article-nav-newer" class="article-nav-title">
-                <a href="/2017/03/10/Android开发规范/">
-                    Android开发规范
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2017/03/17/Android存储路径你了解多少/">
+                    Android存储路径你了解多少？
                 </a>
             </div>
-        
         
     </nav>
 
@@ -290,7 +328,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#DownImageUtil"><span class="toc-number">1.</span> <span class="toc-text">DownImageUtil</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#三步帮你实现"><span class="toc-number">1.1.</span> <span class="toc-text">三步帮你实现</span></a></li></ol></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#介绍"><span class="toc-number">1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#github地址-喜欢的记得Star哦！谢谢大家了！"><span class="toc-number">2.</span> <span class="toc-text">github地址 喜欢的记得Star哦！谢谢大家了！</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#一些技能"><span class="toc-number">3.</span> <span class="toc-text">一些技能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#直接上效果图"><span class="toc-number">4.</span> <span class="toc-text">直接上效果图</span></a></li></ol>
         
     </div>
     <style>
@@ -326,7 +364,7 @@
         </div>
         <script>
             window._bd_share_config={
-                "common":{"bdSnsKey":{},"bdText":"基于Glide的图片下载工具类，简单、高效　| feifei　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+                "common":{"bdSnsKey":{},"bdText":"类似QQ的文件管理器　| feifei　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
         </script>
     
 
@@ -360,15 +398,15 @@
 
     <div class="scroll" id="post-nav-button">
         
-            <a href="/2017/03/10/Android开发规范/" title="上一篇: Android开发规范">
-                <i class="fa fa-angle-left"></i>
-            </a>
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
         
 
         <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
 
         
-            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+            <a href="/2017/03/17/Android存储路径你了解多少/" title="下一篇: Android存储路径你了解多少？">
+                <i class="fa fa-angle-right"></i>
+            </a>
         
     </div>
 
